@@ -1,6 +1,7 @@
 <template>
   <div class="hello">
     <h1>{{ msg }}</h1>
+    <button @click="onClick">Clicky</button>
     <h2>Essential Links</h2>
     <ul>
       <li><a href="https://vuejs.org" target="_blank" rel="noopener">Core Docs</a></li>
@@ -19,14 +20,24 @@
   </div>
 </template>
 
-<script>
-export default {
-  name: 'hello',
-  data() {
-    return {
-      msg: 'Welcome to Your Vue.js PWA',
-    };
+<script lang="ts">
+import Vue  from 'vue'
+import Component from 'vue-class-component'
+
+@Component({
+  props: {
+    up: String
   },
+})
+export default class Hello extends Vue {
+  msg: string = 'Welcome to Your Vue.js PWA';
+  up: string;
+  // use prop values for initial data
+  helloMsg: string = 'Hello, ' + this.up
+
+  onClick(): void {
+    console.log(this.msg, this.helloMsg);
+  }
 };
 </script>
 

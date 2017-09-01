@@ -1,6 +1,4 @@
-(function() {
-  'use strict';
-
+(function () {
   // Check to make sure service workers are supported in the current browser,
   // and that the current page is accessed from a secure origin. Using a
   // service worker from an insecure origin will trigger JS console errors.
@@ -9,17 +7,17 @@
       window.location.hostname === '[::1]' ||
       // 127.0.0.1/8 is considered localhost for IPv4.
       window.location.hostname.match(
-        /^127(?:\.(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){3}$/
-      )
-    );
+        /^127(?:\.(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){3}$/,
+      ),
+  );
 
-  window.addEventListener('load', function() {
-      if ('serviceWorker' in navigator &&
+  window.addEventListener('load', () => {
+    if ('serviceWorker' in navigator &&
           (window.location.protocol === 'https:' || isLocalhost)) {
-        navigator.serviceWorker.register('service-worker.js')
-        .then(function(registration) {
+      navigator.serviceWorker.register('service-worker.js')
+        .then((registration) => {
           // updatefound is fired if service-worker.js changes.
-          registration.onupdatefound = function() {
+          registration.onupdatefound = function () {
             // updatefound is also fired the very first time the SW is installed,
             // and there's no need to prompt for a reload at that point.
             // So check here to see if the page is already controlled,
@@ -28,7 +26,7 @@
               // The updatefound event implies that registration.installing is set
               const installingWorker = registration.installing;
 
-              installingWorker.onstatechange = function() {
+              installingWorker.onstatechange = function () {
                 switch (installingWorker.state) {
                   case 'installed':
                     // At this point, the old content will have been purged and the
@@ -47,9 +45,9 @@
               };
             }
           };
-        }).catch(function(e) {
+        }).catch((e) => {
           console.error('Error during service worker registration:', e);
         });
-      }
+    }
   });
-})();
+}());

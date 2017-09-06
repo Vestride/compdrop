@@ -80,7 +80,7 @@
   },
   "browserslist": [
     "> 1%",
-    "last 2 major versions",
+    "last 2 versions",
     "not ie <= 11"
   ]
 }

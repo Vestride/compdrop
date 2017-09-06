@@ -1,12 +1,18 @@
 <template>
-  <div class="image-viewer" @click="handleClick">
+  <div class="image-viewer"
+      @click="handleNextTrigger"
+      tabindex="-1"
+      @keydown.left.prevent="handlePreviousTrigger"
+      @keydown.75.prevent="handlePreviousTrigger"
+      @keydown.right.prevent="handleNextTrigger"
+      @keydown.74.prevent="handleNextTrigger">
     <div class="image-viewer__images">
       <img v-for="(displayImage, i) in images" class="image-viewer__img" :class="{ hidden: i !== selectedIndex }" :src="displayImage.src" :key="displayImage.id" />
     </div>
-    <button aria-label="next image" class="nav-button nav-button--next" @click="handleNextClick">
+    <button aria-label="next image" class="nav-button nav-button--next" @click.stop="handleNextTrigger">
       <svg viewBox="75.4 27 461.2 738"><path d="M167.7 27l368.9 369-368.9 369-92.3-92.3 276.7-276.7-276.7-276.7z"></path></svg>
     </button>
-    <button aria-label="previous image" class="nav-button nav-button--prev" @click="handlePrevClick">
+    <button aria-label="previous image" class="nav-button nav-button--prev" @click.stop="handlePreviousTrigger">
       <svg viewBox="75.396 26.994 461.208 738.012"><path d="M444.336 765.006l-368.94-369.006 368.94-369.006 92.268 92.268-276.738 276.738 276.738 276.738z"></path></svg>
     </button>
   </div>
@@ -40,30 +46,24 @@ export default class ImageViewer extends Vue {
     return this.selectedIndex;
   }
 
-  handleClick(evt: MouseEvent): void {
+  handleNextTrigger(evt: MouseEvent | KeyboardEvent): void {
     this.goToNext(evt.shiftKey === false);
   }
 
-  handlePrevClick(evt: MouseEvent): void {
-    evt.stopPropagation();
-    this.goToPrevious();
+  handlePreviousTrigger(evt: MouseEvent | KeyboardEvent): void {
+    this.goToPrevious(evt.shiftKey === false);
   }
 
-  handleNextClick(evt: MouseEvent): void {
-    evt.stopPropagation();
-    this.goToNext();
-  }
-
-  goToNext(scrollToTop: boolean = true): void {
+  goToNext(scrollToTop: boolean): void {
     this.setSelectedIndex(this.selectedIndex === this.images.length - 1 ?
       0 :
       this.selectedIndex + 1, scrollToTop);
   }
 
-  goToPrevious(): void {
+  goToPrevious(scrollToTop: boolean): void {
     this.setSelectedIndex(this.selectedIndex === 0 ?
       this.images.length - 1 :
-      this.selectedIndex - 1);
+      this.selectedIndex - 1, scrollToTop);
   }
 }
 </script>

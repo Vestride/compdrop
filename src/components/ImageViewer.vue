@@ -1,6 +1,7 @@
 <template>
-  <div class="image-viewer"
+  <div class="image-viewer" :class="{ 'image-viewer--user-inactive': !isUserActive }"
       @click="handleNextTrigger"
+      @mousemove="handleUserAction"
       tabindex="-1"
       @keydown.left.prevent="handlePreviousTrigger"
       @keydown.75.prevent="handlePreviousTrigger"
@@ -9,10 +10,10 @@
     <div class="image-viewer__images">
       <img v-for="(displayImage, i) in images" class="image-viewer__img" :class="{ hidden: i !== selectedIndex }" :src="displayImage.src" :key="displayImage.id" />
     </div>
-    <button aria-label="next image" class="nav-button nav-button--next" @click.stop="handleNextTrigger">
+    <button aria-label="next image" class="nav-button nav-button--next fade-when-inactive" @click.stop="handleNextTrigger">
       <svg viewBox="75.4 27 461.2 738"><path d="M167.7 27l368.9 369-368.9 369-92.3-92.3 276.7-276.7-276.7-276.7z"></path></svg>
     </button>
-    <button aria-label="previous image" class="nav-button nav-button--prev" @click.stop="handlePreviousTrigger">
+    <button aria-label="previous image" class="nav-button nav-button--prev fade-when-inactive" @click.stop="handlePreviousTrigger">
       <svg viewBox="75.396 26.994 461.208 738.012"><path d="M444.336 765.006l-368.94-369.006 368.94-369.006 92.268 92.268-276.738 276.738 276.738 276.738z"></path></svg>
     </button>
   </div>
@@ -31,6 +32,8 @@ import DisplayImage from '../DisplayImage';
 export default class ImageViewer extends Vue {
   images: DisplayImage[];
   selectedIndex: number = 0;
+  isUserActive: boolean = false;
+  timer: number;
 
   setSelectedIndex(index: number, scrollToTop: boolean = true): void {
     if (index >= 0 || index < this.images.length) {
@@ -46,12 +49,22 @@ export default class ImageViewer extends Vue {
     return this.selectedIndex;
   }
 
+  handleUserAction(): void {
+    clearTimeout(this.timer);
+    this.isUserActive = true;
+    this.timer = setTimeout(() => {
+      this.isUserActive = false;
+    }, 3000);
+  }
+
   handleNextTrigger(evt: MouseEvent | KeyboardEvent): void {
     this.goToNext(evt.shiftKey === false);
+    this.handleUserAction();
   }
 
   handlePreviousTrigger(evt: MouseEvent | KeyboardEvent): void {
     this.goToPrevious(evt.shiftKey === false);
+    this.handleUserAction();
   }
 
   goToNext(scrollToTop: boolean): void {
@@ -72,11 +85,20 @@ export default class ImageViewer extends Vue {
   .image-viewer {
     position: relative;
     min-height: 100vh;
-    /* overflow-x: auto; */
+    background-color: rgb(240, 240, 240);
+  }
+
+  #app.layout-centered .image-viewer__images {
+    display: flex;
+    justify-content: center;
   }
 
   .image-viewer__img {
     user-select: none;
+  }
+
+  .image-viewer--user-inactive .fade-when-inactive {
+    opacity: 0;
   }
 
   .nav-button {
@@ -92,6 +114,7 @@ export default class ImageViewer extends Vue {
     background-color: rgba(0, 0, 0, 0.2);
     border-radius: 50%;
     transition: 200ms ease-out;
+    will-change: transform;
   }
 
   .nav-button--prev {

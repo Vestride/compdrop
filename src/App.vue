@@ -1,5 +1,8 @@
 <template>
-  <div id="app">
+  <div id="app" :class="imageMode === 'centered' ? 'layout-centered' : 'layout-scrollable'"
+    tabindex="-1"
+    @keydown.shift.191="toggleHelp"
+    @keydown.82="reset">
     <main @dragover="handleDragHover" @dragleave="handleDragCancel" @drop="handleDrop">
       <welcome-screen v-if="!hasContent" :can-drop="canDrop"/>
       <image-viewer v-if="hasContent" :images="images"/>
@@ -23,6 +26,7 @@ export default class App extends Vue {
   images: DisplayImage[] = [];
   hasContent: boolean = false;
   canDrop: boolean = false;
+  imageMode: string = 'centered';
 
   handleDragHover(evt: DragEvent): void {
     evt.preventDefault();
@@ -97,6 +101,15 @@ export default class App extends Vue {
     });
   }
 
+  toggleHelp() {
+    console.log('show help');
+  }
+
+  reset() {
+    this.images = [];
+    this.hasContent = false;
+  }
+
   /*
   preloadImages(images: string[]): Promise<void>[] {
     return images.map((dataURI: string) => new Promise((resolve) => {
@@ -131,7 +144,10 @@ body {
 
 main {
   display: block;
-  /* overflow: hidden; */
+}
+
+#app.layout-centered main {
+  overflow: hidden;
 }
 
 .hidden {

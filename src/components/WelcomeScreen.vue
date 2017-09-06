@@ -1,5 +1,5 @@
 <template>
-  <div class="welcome-screen" v-bind:class="{ 'welcome-screen--can-drop': canDrop }">
+  <div class="welcome-screen" :class="{ 'welcome-screen--can-drop': canDrop }">
     <div class="welcome-screen__inner">
       <p class="welcome-screen__text" v-if="!canDrop">Drop images here.</p>
       <p class="welcome-screen__text" v-if="canDrop">Drop em!</p>
@@ -27,15 +27,16 @@ export default class WelcomeScreen extends Vue {
 
 <style scoped>
 .welcome-screen {
-  margin: 40px;
-  height: calc(100vh - 80px);
+  padding: 40px;
+  height: 100vh;
+  background-color: rgb(240, 240, 240);
 }
 
 .welcome-screen__inner {
-  border: 5px dashed gray;
+  border: 5px dashed rgb(189, 189, 189);
   display: flex;
-  padding: 40px;
-  height: inherit;
+  height: 100%;
+  background-color: white;
   align-items: center;
   justify-content: center;
   border-radius: 20px;

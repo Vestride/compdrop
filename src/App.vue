@@ -2,7 +2,7 @@
   <div id="app">
     <main @dragover="handleDragHover" @dragleave="handleDragCancel" @drop="handleDrop">
       <welcome-screen v-if="!hasContent" :can-drop="canDrop"/>
-      <image-viewer v-if="hasContent" :images="blobs"/>
+      <image-viewer v-if="hasContent" :images="images"/>
     </main>
   </div>
 </template>
@@ -10,11 +10,17 @@
 <script lang="ts">
 import Vue from 'vue';
 import Component from 'vue-class-component';
+import DisplayImage from './DisplayImage';
+
+let count = 0;
+function uniqueId(): number {
+  count += 1;
+  return count;
+}
 
 @Component
 export default class App extends Vue {
-  files: File[] = [];
-  blobs: string[] = [];
+  images: DisplayImage[] = [];
   hasContent: boolean = false;
   canDrop: boolean = false;
 
@@ -38,33 +44,68 @@ export default class App extends Vue {
       .sort((a: File, b: File): number => a.name.localeCompare(b.name));
 
     if (fileList.length > 0) {
-      // Async load all files with a FileReader and update the blobs array when done.
-      Promise.all(this.loadFiles(fileList)).then((results) => {
-        // Fix? This won't sort newly added images by file name.
-        this.blobs = this.blobs.concat(results);
-      });
-
-      // Update the files array.
-      // TODO(glen): Any reason to keep this when i'm using the blobs array? Filenames?
-      this.files = this.files.concat(fileList);
+      // Async load all files with a FileReader and update the images array when done.
+      this.renderFirstImage(fileList);
 
       // Set flag for whether there was content.
-      this.hasContent = this.files.length > 0;
+      this.hasContent = this.images.length > 0 || fileList.length > 0;
     }
 
     // Hide drop messaging.
     this.canDrop = false;
   }
 
-  loadFiles(files: File[]): Promise<string>[] {
-    return files.map((file: File) => new Promise((resolve) => {
+  async renderFirstImage(files: File[]) {
+    // Remove the first file from the array.
+    const first = files.shift();
+
+    // Read the file and update the images property so that Vue re-renders.
+    // This intentionally blocks execution for reading the other files.
+    const image = await this.getDisplayImage(first)
+    this.images.push(image);
+
+    // Wait a frame, then start reading the remaining files.
+    // Fix? This won't sort newly added images by file name. Sort button?
+    requestAnimationFrame(() => {
+      Promise.all(this.getDisplayImages(files)).then((images) => {
+        this.images = this.images.concat(images);
+      });
+    });
+  }
+
+  getDisplayImages(files: File[]): Promise<DisplayImage>[] {
+    return files.map(this.getDisplayImage);
+  }
+
+  getDisplayImage(file: File): Promise<DisplayImage> {
+    const id = uniqueId();
+    const filename = file.name;
+    return new Promise((resolve) => {
       const reader = new FileReader();
+
+      // Resolve promise when the reader finishes.
       reader.onload = () => {
-        resolve(reader.result);
+        resolve({
+          id,
+          filename,
+          src: reader.result,
+        });
       };
+
+      // Start reader.
       reader.readAsDataURL(file)
+    });
+  }
+
+  /*
+  preloadImages(images: string[]): Promise<void>[] {
+    return images.map((dataURI: string) => new Promise((resolve) => {
+      const img = new Image();
+      img.onload = () => { resolve(); };
+      img.src = dataURI;
     }));
   }
+  */
 };
 </script>
 
@@ -90,6 +131,10 @@ body {
 
 main {
   display: block;
-  overflow: hidden;
+  /* overflow: hidden; */
+}
+
+.hidden {
+  display: none !important;
 }
 </style>

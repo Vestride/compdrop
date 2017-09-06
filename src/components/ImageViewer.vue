@@ -1,7 +1,6 @@
 <template>
-  <div class="image-viewer" :class="{ 'image-viewer--user-inactive': !isUserActive }"
+  <div class="image-viewer"
       @click="handleNextTrigger"
-      @mousemove="handleUserAction"
       tabindex="-1"
       @keydown.left.prevent="handlePreviousTrigger"
       @keydown.75.prevent="handlePreviousTrigger"
@@ -32,8 +31,6 @@ import DisplayImage from '../DisplayImage';
 export default class ImageViewer extends Vue {
   images: DisplayImage[];
   selectedIndex: number = 0;
-  isUserActive: boolean = false;
-  timer: number;
 
   setSelectedIndex(index: number, scrollToTop: boolean = true): void {
     if (index >= 0 || index < this.images.length) {
@@ -49,22 +46,12 @@ export default class ImageViewer extends Vue {
     return this.selectedIndex;
   }
 
-  handleUserAction(): void {
-    clearTimeout(this.timer);
-    this.isUserActive = true;
-    this.timer = setTimeout(() => {
-      this.isUserActive = false;
-    }, 3000);
-  }
-
   handleNextTrigger(evt: MouseEvent | KeyboardEvent): void {
     this.goToNext(evt.shiftKey === false);
-    this.handleUserAction();
   }
 
   handlePreviousTrigger(evt: MouseEvent | KeyboardEvent): void {
     this.goToPrevious(evt.shiftKey === false);
-    this.handleUserAction();
   }
 
   goToNext(scrollToTop: boolean): void {
@@ -81,24 +68,20 @@ export default class ImageViewer extends Vue {
 }
 </script>
 
-<style scoped>
+<style>
   .image-viewer {
     position: relative;
     min-height: 100vh;
     background-color: rgb(240, 240, 240);
   }
 
-  #app.layout-centered .image-viewer__images {
+  .layout-centered .image-viewer__images {
     display: flex;
     justify-content: center;
   }
 
   .image-viewer__img {
     user-select: none;
-  }
-
-  .image-viewer--user-inactive .fade-when-inactive {
-    opacity: 0;
   }
 
   .nav-button {

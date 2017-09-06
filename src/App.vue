@@ -1,8 +1,15 @@
 <template>
-  <div id="app" :class="imageMode === 'centered' ? 'layout-centered' : 'layout-scrollable'"
+  <div id="app" :class="{
+    'layout-centered': isCenteredImageMode,
+    'user-inactive': !isUserActive,
+  }"
     tabindex="-1"
-    @keydown.shift.191="toggleHelp"
+    @mousemove="handleUserAction"
+    @keydown="handleUserAction"
+    @mousedown="handleUserAction"
+    @keydown.shift.191="helpToggle"
     @keydown.82="reset">
+    <help-menu />
     <main @dragover="handleDragHover" @dragleave="handleDragCancel" @drop="handleDrop">
       <welcome-screen v-if="!hasContent" :can-drop="canDrop"/>
       <image-viewer v-if="hasContent" :images="images"/>
@@ -26,7 +33,11 @@ export default class App extends Vue {
   images: DisplayImage[] = [];
   hasContent: boolean = false;
   canDrop: boolean = false;
-  imageMode: string = 'centered';
+  isCenteredImageMode: boolean = true;
+
+  // Activity watcher.
+  isUserActive: boolean = false;
+  timer: number;
 
   handleDragHover(evt: DragEvent): void {
     evt.preventDefault();
@@ -101,13 +112,23 @@ export default class App extends Vue {
     });
   }
 
-  toggleHelp() {
-    console.log('show help');
+  helpToggle() {
+    console.log('help toggle from keyboard ?');
+    this.$emit('helptoggle');
   }
 
   reset() {
     this.images = [];
     this.hasContent = false;
+  }
+
+  // Activity watcher
+  handleUserAction(): void {
+    clearTimeout(this.timer);
+    this.isUserActive = true;
+    this.timer = setTimeout(() => {
+      this.isUserActive = false;
+    }, 3000);
   }
 
   /*
@@ -123,34 +144,11 @@ export default class App extends Vue {
 </script>
 
 <style>
-html {
-  box-sizing: border-box;
-  -ms-text-size-adjust: 100%;
-  -webkit-text-size-adjust: 100%;
-}
-
-*,
-*::before,
-*::after {
-  box-sizing: inherit;
-}
-
-body {
-  margin: 0;
-  color: #404040;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
-  line-height: 1.4;
-}
-
-main {
-  display: block;
-}
-
-#app.layout-centered main {
+.layout-centered main {
   overflow: hidden;
 }
 
-.hidden {
-  display: none !important;
+.user-inactive .fade-when-inactive {
+  opacity: 0;
 }
 </style>

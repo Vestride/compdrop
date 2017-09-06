@@ -25,7 +25,7 @@ export default class WelcomeScreen extends Vue {
 </script>
 
 
-<style scoped>
+<style>
 .welcome-screen {
   padding: 40px;
   height: 100vh;
@@ -39,7 +39,7 @@ export default class WelcomeScreen extends Vue {
   background-color: white;
   align-items: center;
   justify-content: center;
-  border-radius: 20px;
+  border-radius: 12px;
 }
 
 .welcome-screen--can-drop .welcome-screen__inner {

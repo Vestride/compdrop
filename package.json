@@ -12,6 +12,7 @@
     "test": "npm run unit"
   },
   "dependencies": {
+    "@odopod/odo-dialog": "^1.1.1",
     "tslib": "^1.7.1",
     "vue": "^2.3.3",
     "vue-class-component": "^5.0.2"

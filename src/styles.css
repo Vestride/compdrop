@@ -1,0 +1,160 @@
+html {
+  box-sizing: border-box;
+  -ms-text-size-adjust: 100%;
+  -webkit-text-size-adjust: 100%;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: inherit;
+}
+
+body {
+  margin: 0;
+  color: rgb(64, 64, 64);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  line-height: 1.4;
+}
+
+main {
+  display: block;
+}
+
+.hidden {
+  display: none !important;
+}
+
+.type-header-1,
+.type-header-2,
+.type-header-3 {
+  margin-top: 0;
+  margin-bottom: 0.5em;
+  font-weight: 400;
+  color: rgb(38, 38, 38);
+}
+
+.type-header-1 {
+  font-size: 2em;
+}
+
+.type-header-2 {
+  font-size: 1.5em;
+}
+
+.type-header-3 {
+  font-size: 1.17em;
+}
+
+.container {
+  width: 93%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  grid-gap: 16px;
+}
+
+.col-6\@xs {
+  grid-column: span 6;
+}
+
+.col-5\@xs {
+  grid-column: span 5;
+}
+
+.col-4\@xs {
+  grid-column: span 4;
+}
+
+.col-3\@xs {
+  grid-column: span 3;
+}
+
+.col-2\@xs {
+  grid-column: span 2;
+}
+
+.col-1\@xs {
+  grid-column: span 1;
+}
+
+@media screen and (min-width: 768px) {
+  .container {
+    width: 86%;
+    max-width: 1200px;
+  }
+
+  .row {
+    grid-template-columns: repeat(12, 1fr);
+  }
+
+  .col-1\@sm {
+    grid-column: span 1;
+  }
+
+  .col-2\@sm {
+    grid-column: span 2;
+  }
+
+  .col-3\@sm {
+    grid-column: span 3;
+  }
+
+  .col-4\@sm {
+    grid-column: span 4;
+  }
+
+  .col-5\@sm {
+    grid-column: span 5;
+  }
+
+  .col-6\@sm {
+    grid-column: span 6;
+  }
+
+  .col-7\@sm {
+    grid-column: span 7;
+  }
+
+  .col-8\@sm {
+    grid-column: span 8;
+  }
+
+  .col-9\@sm {
+    grid-column: span 9;
+  }
+
+  .col-10\@sm {
+    grid-column: span 10;
+  }
+
+  .col-11\@sm {
+    grid-column: span 11;
+  }
+
+  .col-12\@sm {
+    grid-column: span 12;
+  }
+
+  .type-header-1 {
+    font-size: 2.25em;
+  }
+
+  .type-header-2 {
+    font-size: 2.25em;
+  }
+
+  .type-header-3 {
+    font-size: 1.75em;
+  }
+}
+
+.unstyled-list {
+  margin: 0;
+  padding-left: 0;
+  list-style-type: none;
+}

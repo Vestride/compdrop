@@ -35,12 +35,12 @@ const hotMiddleware = require('webpack-hot-middleware')(compiler, {
   log: false,
 });
 // force page reload when html-webpack-plugin template changes
-compiler.plugin('compilation', (compilation) => {
-  compilation.plugin('html-webpack-plugin-after-emit', (data, cb) => {
-    hotMiddleware.publish({ action: 'reload' });
-    cb();
-  });
-});
+// compiler.plugin('compilation', (compilation) => {
+//   compilation.plugin('html-webpack-plugin-after-emit', (data, cb) => {
+//     hotMiddleware.publish({ action: 'reload' });
+//     cb();
+//   });
+// });
 
 // proxy api requests
 Object.keys(proxyTable).forEach((context) => {

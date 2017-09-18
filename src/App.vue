@@ -5,10 +5,7 @@
   }"
     tabindex="-1"
     @mousemove="handleUserAction"
-    @keydown="handleUserAction"
-    @mousedown="handleUserAction"
-    @keydown.shift.191="helpToggle"
-    @keydown.82="reset">
+    @mousedown="handleUserAction">
     <help-menu />
     <main @dragover="handleDragHover" @dragleave="handleDragCancel" @drop="handleDrop">
       <welcome-screen v-if="!hasContent" :can-drop="canDrop"/>
@@ -112,8 +109,22 @@ export default class App extends Vue {
     });
   }
 
+  mounted() {
+    this._handleKeyDown = this._handleKeyDown.bind(this);
+    document.addEventListener('keydown', this._handleKeyDown);
+  }
+
+  _handleKeyDown(evt: KeyboardEvent) {
+    this.handleUserAction();
+
+    if (evt.shiftKey && evt.keyCode === 191) {
+      this.helpToggle();
+    } else if (evt.keyCode === 82) {
+      this.reset();
+    }
+  }
+
   helpToggle() {
-    console.log('help toggle from keyboard ?');
     this.$emit('helptoggle');
   }
 

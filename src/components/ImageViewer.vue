@@ -32,6 +32,15 @@ export default class ImageViewer extends Vue {
   images: DisplayImage[];
   selectedIndex: number = 0;
 
+  mounted(): void {
+    // Reset the current index when the images array updates.
+    this.$watch('images', (newValue, oldValue) => {
+      if (newValue.length !== oldValue.length) {
+        this.selectedIndex = 0;
+      }
+    });
+  }
+
   setSelectedIndex(index: number, scrollToTop: boolean = true): void {
     if (index >= 0 || index < this.images.length) {
       this.selectedIndex = index;

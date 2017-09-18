@@ -25,9 +25,15 @@ function uniqueId(): number {
   return count;
 }
 
+function maybePluralize(count: number, noun: string, suffix: string = 's') {
+  return `${count} ${noun}${count !== 1 ? suffix : ''}`;
+}
+
 @Component
 export default class App extends Vue {
+  groups: DisplayImage[][] = [];
   images: DisplayImage[] = [];
+  selectedGroupIndex: number = 0;
   hasContent: boolean = false;
   canDrop: boolean = false;
   isCenteredImageMode: boolean = true;
@@ -57,30 +63,40 @@ export default class App extends Vue {
 
     if (fileList.length > 0) {
       // Async load all files with a FileReader and update the images array when done.
-      this.renderFirstImage(fileList);
+      this.renderFirstImageThenOthers(fileList);
 
       // Set flag for whether there was content.
-      this.hasContent = this.images.length > 0 || fileList.length > 0;
+      this.hasContent = this.groups.length > 0 || fileList.length > 0;
     }
 
     // Hide drop messaging.
     this.canDrop = false;
   }
 
-  async renderFirstImage(files: File[]) {
+  async renderFirstImageThenOthers(files: File[]): Promise<void> {
     // Remove the first file from the array.
     const first = files.shift();
 
     // Read the file and update the images property so that Vue re-renders.
     // This intentionally blocks execution for reading the other files.
-    const image = await this.getDisplayImage(first)
-    this.images.push(image);
+    const image = await this.getDisplayImage(first);
+    const groupIndex = this.groups.length;
+    this.groups[groupIndex] = [image];
+    this.images = [image];
 
     // Wait a frame, then start reading the remaining files.
     // Fix? This won't sort newly added images by file name. Sort button?
     requestAnimationFrame(() => {
       Promise.all(this.getDisplayImages(files)).then((images) => {
+        this.groups[groupIndex] = this.groups[groupIndex].concat(images);
         this.images = this.images.concat(images);
+
+        if (this.groups.length > 1) {
+          const totalImages = this.groups.reduce((total, images) => total + images.length, 0);
+          document.title = `${maybePluralize(this.groups.length, 'group')} – ${maybePluralize(totalImages, 'image')} – compdrop`;
+        } else {
+          document.title = `${maybePluralize(this.images.length, 'image')} – compdrop`;
+        }
       });
     });
   }
@@ -109,27 +125,42 @@ export default class App extends Vue {
     });
   }
 
-  mounted() {
+  setSelectedGroup(index: number): void {
+    if (this.hasContent && index > -1 && index < this.groups.length) {
+      this.selectedGroupIndex = index;
+      this.images = this.groups[index];
+    }
+  }
+
+  mounted(): void {
     this._handleKeyDown = this._handleKeyDown.bind(this);
     document.addEventListener('keydown', this._handleKeyDown);
   }
 
-  _handleKeyDown(evt: KeyboardEvent) {
+  beforeDestroy(): void {
+    document.removeEventListener('keydown', this._handleKeyDown);
+  }
+
+  _handleKeyDown(evt: KeyboardEvent): void {
     this.handleUserAction();
+    const number = parseInt(evt.key, 10);
+    const isNumber = !isNaN(number);
 
     if (evt.shiftKey && evt.keyCode === 191) {
       this.helpToggle();
     } else if (evt.keyCode === 82) {
       this.reset();
+    } else if (isNumber && !evt.metaKey && !evt.shiftKey) {
+      this.setSelectedGroup(number - 1);
     }
   }
 
-  helpToggle() {
+  helpToggle(): void {
     this.$emit('helptoggle');
   }
 
-  reset() {
-    this.images = [];
+  reset(): void {
+    this.groups = [];
     this.hasContent = false;
   }
 

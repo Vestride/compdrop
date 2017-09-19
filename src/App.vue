@@ -7,6 +7,7 @@
     @mousemove="handleUserAction"
     @mousedown="handleUserAction">
     <help-menu />
+    <settings-menu @layoutchange="handleLayoutChange" />
     <main @dragover="handleDragHover" @dragleave="handleDragCancel" @drop="handleDrop">
       <welcome-screen v-if="!hasContent" :can-drop="canDrop"/>
       <collection-viewer v-if="hasContent" :collections="collections"/>
@@ -72,30 +73,31 @@ export default class App extends Vue {
   async renderFirstImageThenOthers(files: File[]): Promise<void> {
     const collectionId = uniqueId();
     // Remove the first file from the array.
-    // const first = files.shift();
+    const first = files.shift();
 
     // Read the file and update the images property so that Vue re-renders.
     // This intentionally blocks execution for reading the other files.
-    // const image = await this.getDisplayImage(first);
-    // const collectionIndex = this.collections.length;
-    // this.collections[collectionIndex] = [image];
+    const image = await this.getDisplayImage(first);
+    const collectionIndex = this.collections.length;
+    this.collections[collectionIndex] = {
+      id: collectionId,
+      images: [image],
+    };
 
     // Set flag for whether there was content after the first display image has
     // been read.
-    // this.hasContent = this.collections.length > 0 || files.length > 0;
+    this.hasContent = this.collections.length > 0 || files.length > 0;
 
     // Wait a frame, then start reading the remaining files.
-    // requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
       Promise.all(this.getDisplayImages(files)).then((images) => {
-        // this.collections[collectionIndex] = this.collections[collectionIndex].concat(images);
-        this.collections.push({
-          id: collectionId,
-          images,
+        this.collections.splice(collectionIndex, 1, {
+          id: this.collections[collectionIndex].id,
+          images: this.collections[collectionIndex].images.concat(images),
         });
-        this.hasContent = this.collections.length > 0 || files.length > 0;
         this.updatePageTitle();
       });
-    // });
+    });
   }
 
   getDisplayImages(files: File[]): Promise<DisplayImage>[] {
@@ -128,7 +130,11 @@ export default class App extends Vue {
       return `${maybePluralize(this.collections.length, 'collection')} – ${maybePluralize(totalImages, 'image')} – compdrop`;
     }
 
-    return `${maybePluralize(this.collections[0].images.length, 'image')} – compdrop`;
+    if (this.collections.length > 0) {
+      return `${maybePluralize(this.collections[0].images.length, 'image')} – compdrop`;
+    }
+
+    return 'compdrop';
   }
 
   updatePageTitle(): void {
@@ -149,10 +155,15 @@ export default class App extends Vue {
     const number = parseInt(evt.key, 10);
     const isNumber = !isNaN(number);
 
-    if (evt.shiftKey && evt.keyCode === 191) {
+    if (evt.key === '?') {
       this.helpToggle();
-    } else if (evt.keyCode === 82) {
+    } else if (evt.key === 's') {
+      this.settingsToggle();
+    } else if (evt.key === 'h') {
+      this.isUserActive = false;
+    } else if (evt.key === 'r') {
       this.reset();
+      this.updatePageTitle();
     } else if (this.hasContent && isNumber && !evt.metaKey && !evt.shiftKey) {
       this.$emit('selectgroup', number - 1);
     }
@@ -160,6 +171,10 @@ export default class App extends Vue {
 
   helpToggle(): void {
     this.$emit('helptoggle');
+  }
+
+  settingsToggle(): void {
+    this.$emit('settingstoggle');
   }
 
   reset(): void {
@@ -174,6 +189,10 @@ export default class App extends Vue {
     this.timer = setTimeout(() => {
       this.isUserActive = false;
     }, 3000);
+  }
+
+  handleLayoutChange(isCenteredLayout: boolean): void {
+    this.isCenteredImageMode = isCenteredLayout;
   }
 
   /*

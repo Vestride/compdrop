@@ -32,7 +32,7 @@ export default class WelcomeScreen extends Vue {
 
 <style>
 .welcome-screen {
-  padding: 40px;
+  padding: 52px 40px;
   height: 100vh;
   background-color: rgb(240, 240, 240);
 }

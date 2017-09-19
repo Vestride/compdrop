@@ -35,6 +35,14 @@ export default {
           desc: 'Toggle [this] help menu',
         },
         {
+          keys: ['S'],
+          desc: 'Toggle settings menu',
+        },
+        {
+          keys: ['H'],
+          desc: 'Hide Compdrop UI elements',
+        },
+        {
           keys: ['R'],
           desc: 'Remove all images',
         },

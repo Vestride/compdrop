@@ -9,7 +9,7 @@
     <help-menu />
     <main @dragover="handleDragHover" @dragleave="handleDragCancel" @drop="handleDrop">
       <welcome-screen v-if="!hasContent" :can-drop="canDrop"/>
-      <image-viewer v-if="hasContent" :images="images"/>
+      <collection-viewer v-if="hasContent" :collections="collections"/>
     </main>
   </div>
 </template>
@@ -18,6 +18,7 @@
 import Vue from 'vue';
 import Component from 'vue-class-component';
 import DisplayImage from './DisplayImage';
+import Collection from './Collection';
 
 let count = 0;
 function uniqueId(): number {
@@ -31,9 +32,7 @@ function maybePluralize(count: number, noun: string, suffix: string = 's') {
 
 @Component
 export default class App extends Vue {
-  groups: DisplayImage[][] = [];
-  images: DisplayImage[] = [];
-  selectedGroupIndex: number = 0;
+  collections: Collection[] = [];
   hasContent: boolean = false;
   canDrop: boolean = false;
   isCenteredImageMode: boolean = true;
@@ -64,9 +63,6 @@ export default class App extends Vue {
     if (fileList.length > 0) {
       // Async load all files with a FileReader and update the images array when done.
       this.renderFirstImageThenOthers(fileList);
-
-      // Set flag for whether there was content.
-      this.hasContent = this.groups.length > 0 || fileList.length > 0;
     }
 
     // Hide drop messaging.
@@ -74,31 +70,32 @@ export default class App extends Vue {
   }
 
   async renderFirstImageThenOthers(files: File[]): Promise<void> {
+    const collectionId = uniqueId();
     // Remove the first file from the array.
-    const first = files.shift();
+    // const first = files.shift();
 
     // Read the file and update the images property so that Vue re-renders.
     // This intentionally blocks execution for reading the other files.
-    const image = await this.getDisplayImage(first);
-    const groupIndex = this.groups.length;
-    this.groups[groupIndex] = [image];
-    this.images = [image];
+    // const image = await this.getDisplayImage(first);
+    // const collectionIndex = this.collections.length;
+    // this.collections[collectionIndex] = [image];
+
+    // Set flag for whether there was content after the first display image has
+    // been read.
+    // this.hasContent = this.collections.length > 0 || files.length > 0;
 
     // Wait a frame, then start reading the remaining files.
-    // Fix? This won't sort newly added images by file name. Sort button?
-    requestAnimationFrame(() => {
+    // requestAnimationFrame(() => {
       Promise.all(this.getDisplayImages(files)).then((images) => {
-        this.groups[groupIndex] = this.groups[groupIndex].concat(images);
-        this.images = this.images.concat(images);
-
-        if (this.groups.length > 1) {
-          const totalImages = this.groups.reduce((total, images) => total + images.length, 0);
-          document.title = `${maybePluralize(this.groups.length, 'group')} – ${maybePluralize(totalImages, 'image')} – compdrop`;
-        } else {
-          document.title = `${maybePluralize(this.images.length, 'image')} – compdrop`;
-        }
+        // this.collections[collectionIndex] = this.collections[collectionIndex].concat(images);
+        this.collections.push({
+          id: collectionId,
+          images,
+        });
+        this.hasContent = this.collections.length > 0 || files.length > 0;
+        this.updatePageTitle();
       });
-    });
+    // });
   }
 
   getDisplayImages(files: File[]): Promise<DisplayImage>[] {
@@ -125,11 +122,17 @@ export default class App extends Vue {
     });
   }
 
-  setSelectedGroup(index: number): void {
-    if (this.hasContent && index > -1 && index < this.groups.length) {
-      this.selectedGroupIndex = index;
-      this.images = this.groups[index];
+  getPageTitle(): string {
+    if (this.collections.length > 1) {
+      const totalImages = this.collections.reduce((total, collection) => total + collection.images.length, 0);
+      return `${maybePluralize(this.collections.length, 'collection')} – ${maybePluralize(totalImages, 'image')} – compdrop`;
     }
+
+    return `${maybePluralize(this.collections[0].images.length, 'image')} – compdrop`;
+  }
+
+  updatePageTitle(): void {
+    document.title = this.getPageTitle();
   }
 
   mounted(): void {
@@ -150,8 +153,8 @@ export default class App extends Vue {
       this.helpToggle();
     } else if (evt.keyCode === 82) {
       this.reset();
-    } else if (isNumber && !evt.metaKey && !evt.shiftKey) {
-      this.setSelectedGroup(number - 1);
+    } else if (this.hasContent && isNumber && !evt.metaKey && !evt.shiftKey) {
+      this.$emit('selectgroup', number - 1);
     }
   }
 
@@ -160,7 +163,7 @@ export default class App extends Vue {
   }
 
   reset(): void {
-    this.groups = [];
+    this.collections = [];
     this.hasContent = false;
   }
 

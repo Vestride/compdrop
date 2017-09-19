@@ -19,6 +19,7 @@
               <p>You are viewing files on <em>your own machine</em>. Compdrop <strong>does not store any of your data</strong>.</p>
               <p>Built by <a href="https://glencheney.com">Glen Cheney</a>. Based on the original <a href="https://github.com/lucasishuman/cmpdrp">cmpdrp</a>.</p>
               <p>Compdrop is a progressive web app and you can use it even if you&rsquo;re have no internet connection.</p>
+              <p>View the project on <a href="https://github.com/Vestride/compdrop">GitHub</a>.</p>
             </div>
             <div class="col-6@sm">
               <h3 class="type-header-3">Keyboard Shortcuts</h3>
@@ -103,18 +104,18 @@ h3 {
 }
 
 .odo-dialog__close {
-  top: 12px;
+  top: 16px;
   right: 12px;
   color: rgb(64, 64, 64);
 }
 
 .help-dialog__header {
-  padding: 12px;
+  padding: 16px;
   background-color: white;
 }
 
 .help-dialog__content {
-  padding: 12px;
+  padding: 16px;
   background-color: rgb(247, 247, 247);
 }
 </style>

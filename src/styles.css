@@ -25,6 +25,10 @@ main {
   display: none !important;
 }
 
+.type--center {
+  text-align: center;
+}
+
 .type-header-1,
 .type-header-2,
 .type-header-3 {

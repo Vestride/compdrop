@@ -1,8 +1,13 @@
 <template>
   <div class="welcome-screen" :class="{ 'welcome-screen--can-drop': canDrop }">
     <div class="welcome-screen__inner">
-      <p class="welcome-screen__text" v-if="!canDrop">Drop images here.</p>
-      <p class="welcome-screen__text" v-if="canDrop">Drop em!</p>
+      <div class="type--center" v-if="!canDrop">
+        <p class="type-header-1">Drop images here.</p>
+        <p>png, jpg, gif, bmp</p>
+      </div>
+      <div v-if="canDrop">
+        <p class="type-header-1">Release!</p>
+      </div>
     </div>
   </div>
 </template>
@@ -49,7 +54,6 @@ export default class WelcomeScreen extends Vue {
 
 .welcome-screen__text {
   margin: 0;
-  font-size: 36px;
 }
 </style>
 

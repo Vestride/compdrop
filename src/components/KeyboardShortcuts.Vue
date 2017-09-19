@@ -27,6 +27,10 @@ export default {
           desc: 'Navigate without scrolling to the top',
         },
         {
+          keys: ['1', '2', '3'],
+          desc: 'Switch collection (numbers 1 through 9)',
+        },
+        {
           keys: ['?'],
           desc: 'Toggle [this] help menu',
         },

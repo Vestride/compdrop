@@ -9,7 +9,7 @@
     <help-menu />
     <settings-menu @layoutchange="handleLayoutChange" @retinachange="handleRetinaChange" />
     <collection-menu v-if="hasContent" :collections="collections" />
-    <main @dragover="handleDragHover" @dragleave="handleDragCancel" @drop="handleDrop">
+    <main>
       <welcome-screen v-if="!hasContent" :can-drop="canDrop"/>
       <collection-viewer v-if="hasContent" :collections="collections" :scale-images="isScaledImageMode" />
     </main>
@@ -44,18 +44,17 @@ export default class App extends Vue {
   isUserActive: boolean = false;
   timer: number;
 
-  handleDragHover(evt: DragEvent): void {
+  _handleDragHover(evt: DragEvent): void {
     evt.preventDefault();
-    // evt.dataTransfer.dropEffect = 'copy';
     this.canDrop = true;
   }
 
-  handleDragCancel(evt: DragEvent): void {
+  _handleDragCancel(evt: DragEvent): void {
     evt.preventDefault();
     this.canDrop = false;
   }
 
-  handleDrop(evt: DragEvent): void {
+  _handleDrop(evt: DragEvent): void {
     evt.preventDefault();
 
     // Filter out non-images and sort by file name.
@@ -145,11 +144,20 @@ export default class App extends Vue {
 
   mounted(): void {
     this._handleKeyDown = this._handleKeyDown.bind(this);
-    document.addEventListener('keydown', this._handleKeyDown);
+    this._handleDragHover = this._handleDragHover.bind(this);
+    this._handleDragCancel = this._handleDragCancel.bind(this);
+    this._handleDrop = this._handleDrop.bind(this);
+    document.body.addEventListener('keydown', this._handleKeyDown);
+    document.body.addEventListener('dragover', this._handleDragHover);
+    document.body.addEventListener('dragleave', this._handleDragCancel);
+    document.body.addEventListener('drop', this._handleDrop);
   }
 
   beforeDestroy(): void {
-    document.removeEventListener('keydown', this._handleKeyDown);
+    document.body.removeEventListener('keydown', this._handleKeyDown);
+    document.body.removeEventListener('dragover', this._handleDragHover);
+    document.body.removeEventListener('dragleave', this._handleDragCancel);
+    document.body.removeEventListener('drop', this._handleDrop);
   }
 
   _handleKeyDown(evt: KeyboardEvent): void {
@@ -206,16 +214,6 @@ export default class App extends Vue {
   handleRetinaChange(isHalfSize: boolean): void {
     this.isScaledImageMode = isHalfSize;
   }
-
-  /*
-  preloadImages(images: string[]): Promise<void>[] {
-    return images.map((dataURI: string) => new Promise((resolve) => {
-      const img = new Image();
-      img.onload = () => { resolve(); };
-      img.src = dataURI;
-    }));
-  }
-  */
 };
 </script>
 

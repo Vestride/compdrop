@@ -5,18 +5,18 @@ const Z_DIALOG = 1050;
 class Dialog extends OdoDialog {
   z: number = Z_DIALOG;
 
-  getOpenDialogCount(): number {
+  static getOpenDialogCount(): number {
     return OdoDialog.Instances.filter((instance: Dialog) => instance.isOpen).length;
   }
 
-  getNextTopLayer(): number {
+  static getNextTopLayer(): number {
     const layers = OdoDialog.Instances.map((instance: Dialog) => instance.z);
     return Math.max(...layers) + 20;
   }
 
   open(): void {
-    if (this.getOpenDialogCount() > 0) {
-      this.z = this.getNextTopLayer();
+    if (Dialog.getOpenDialogCount() > 0) {
+      this.z = Dialog.getNextTopLayer();
       (this.element as HTMLElement).style.zIndex = '' + this.z;
       (this.backdrop as HTMLElement).style.zIndex = '' + (this.z - 5);
 

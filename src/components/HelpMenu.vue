@@ -13,7 +13,7 @@
             <h2 class="type-header-2 marginless" id="help-dialog-title">Compdrop Help</h2>
           </div>
           <div class="row dialog-content">
-            <div class="col-6@sm">
+            <div class="col-6@xs col-6@sm">
               <h3 class="type-header-3">What is this?</h3>
               <p>Compdrop is a simple way to view website designs in a desktop browser. Just drag and drop your images into the browser. Images are aligned to the top of the window and horizontally centered.</p>
               <p>You are viewing files on <em>your own machine</em>. Compdrop <strong>does not store any of your data</strong>.</p>
@@ -21,7 +21,7 @@
               <p>Compdrop is a progressive web app and you can use it even if you&rsquo;re have no internet connection.</p>
               <p>View the project on <a href="https://github.com/Vestride/compdrop">GitHub</a>.</p>
             </div>
-            <div class="col-6@sm">
+            <div class="col-6@xs col-6@sm">
               <h3 class="type-header-3">Keyboard Shortcuts</h3>
               <keyboard-shortcuts />
             </div>

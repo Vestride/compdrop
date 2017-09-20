@@ -10,7 +10,7 @@
     <settings-menu @layoutchange="handleLayoutChange" @retinachange="handleRetinaChange" />
     <collection-menu v-if="hasContent" :collections="collections" />
     <main>
-      <welcome-screen v-if="!hasContent" :can-drop="canDrop"/>
+      <welcome-screen v-if="!hasContent" :can-drop="canDrop" @fileschosen="_addFileList" />
       <collection-viewer v-if="hasContent" :collections="collections" :scale-images="isScaledImageMode" />
     </main>
   </div>
@@ -56,15 +56,18 @@ export default class App extends Vue {
 
   _handleDrop(evt: DragEvent): void {
     evt.preventDefault();
+    this._addFileList(evt.dataTransfer.files);
+  }
 
+  _addFileList(fileList: FileList): void {
     // Filter out non-images and sort by file name.
-    const fileList = Array.from(evt.dataTransfer.files)
+    const files = Array.from(fileList)
       .filter((file: File): boolean => file.type.includes('image/'))
       .sort((a: File, b: File): number => a.name.localeCompare(b.name));
 
-    if (fileList.length > 0) {
+    if (files.length > 0) {
       // Async load all files with a FileReader and update the images array when done.
-      this.renderFirstImageThenOthers(fileList);
+      this.renderFirstImageThenOthers(files);
     }
 
     // Hide drop messaging.

@@ -13,7 +13,7 @@
             <h2 class="type-header-2 marginless" id="settings-dialog-title">Compdrop Settings</h2>
           </div>
           <div class="row dialog-content">
-            <div class="col-12@sm">
+            <div class="col-6@xs col-12@sm">
               <div>
                 <input type="checkbox" id="checkbox-centered-layout"
                   :checked="centeredLayout"

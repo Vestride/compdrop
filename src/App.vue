@@ -8,6 +8,7 @@
     @mousedown="handleUserAction">
     <help-menu />
     <settings-menu @layoutchange="handleLayoutChange" @retinachange="handleRetinaChange" />
+    <collection-menu v-if="hasContent" :collections="collections" />
     <main @dragover="handleDragHover" @dragleave="handleDragCancel" @drop="handleDrop">
       <welcome-screen v-if="!hasContent" :can-drop="canDrop"/>
       <collection-viewer v-if="hasContent" :collections="collections" :scale-images="isScaledImageMode" />
@@ -160,6 +161,8 @@ export default class App extends Vue {
       this.helpToggle();
     } else if (evt.key === 's') {
       this.settingsToggle();
+    } else if (evt.key === 'c') {
+      this.collectionsToggle();
     } else if (evt.key === 'h') {
       this.isUserActive = false;
     } else if (evt.key === 'r') {
@@ -176,6 +179,10 @@ export default class App extends Vue {
 
   settingsToggle(): void {
     this.$emit('settingstoggle');
+  }
+
+  collectionsToggle(): void {
+    this.$emit('collectionstoggle');
   }
 
   reset(): void {

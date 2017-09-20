@@ -21,6 +21,11 @@ main {
   display: block;
 }
 
+img {
+  display: block;
+  max-width: 100%;
+}
+
 .type-header-1,
 .type-header-2,
 .type-header-3 {

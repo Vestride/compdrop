@@ -39,6 +39,10 @@ export default {
           desc: 'Toggle settings menu',
         },
         {
+          keys: ['C'],
+          desc: 'Toggle collection menu',
+        },
+        {
           keys: ['H'],
           desc: 'Hide Compdrop UI elements',
         },

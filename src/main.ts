@@ -7,6 +7,7 @@ import ImageViewer from './components/ImageViewer.vue';
 import CollectionViewer from './components/CollectionViewer.vue';
 import HelpMenu from './components/HelpMenu.vue';
 import SettingsMenu from './components/SettingsMenu.vue';
+import CollectionMenu from './components/CollectionMenu.vue';
 import KeyboardShortcuts from './components/KeyboardShortcuts.vue';
 
 Vue.config.productionTip = false;
@@ -16,6 +17,7 @@ Vue.component('image-viewer', ImageViewer);
 Vue.component('collection-viewer', CollectionViewer);
 Vue.component('help-menu', HelpMenu);
 Vue.component('settings-menu', SettingsMenu);
+Vue.component('collection-menu', CollectionMenu);
 Vue.component('keyboard-shortcuts', KeyboardShortcuts);
 
 /* eslint-disable no-new */

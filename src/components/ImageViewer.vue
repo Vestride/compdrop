@@ -90,6 +90,7 @@ export default class ImageViewer extends Vue {
   .image-viewer__img {
     transform-origin: top center;
     user-select: none;
+    max-width: none;
   }
 
   .nav-button {

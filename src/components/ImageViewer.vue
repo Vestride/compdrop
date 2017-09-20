@@ -7,7 +7,12 @@
       @keydown.right.prevent="handleNextTrigger"
       @keydown.74.prevent="handleNextTrigger">
     <div class="image-viewer__images">
-      <img v-for="(displayImage, i) in images" class="image-viewer__img" :class="{ hidden: i !== selectedIndex }" :src="displayImage.src" :key="displayImage.id" />
+      <img v-for="(displayImage, i) in images" class="image-viewer__img"
+        :class="{ hidden: i !== selectedIndex }"
+        :src="displayImage.src"
+        :alt="displayImage.filename"
+        :key="displayImage.id"
+        :style="{ transform: scaleImages ? 'scale(0.5)' : 'none' }" />
     </div>
     <button aria-label="next image" class="nav-button nav-button--next fade-when-inactive" @click.stop="handleNextTrigger">
       <svg viewBox="75.4 27 461.2 738"><path d="M167.7 27l368.9 369-368.9 369-92.3-92.3 276.7-276.7-276.7-276.7z"></path></svg>
@@ -26,10 +31,12 @@ import DisplayImage from '../DisplayImage';
 @Component({
   props: {
     images: Array,
+    scaleImages: Boolean,
   },
 })
 export default class ImageViewer extends Vue {
   images: DisplayImage[];
+  scaleImages: boolean;
   selectedIndex: number = 0;
 
   setSelectedIndex(index: number, scrollToTop: boolean = true): void {
@@ -81,6 +88,7 @@ export default class ImageViewer extends Vue {
   }
 
   .image-viewer__img {
+    transform-origin: top center;
     user-select: none;
   }
 

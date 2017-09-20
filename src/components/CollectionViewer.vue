@@ -4,7 +4,8 @@
       v-for="(collection, i) in collections"
       :key="collection.id"
       :class="{ hidden: i !== selectedIndex }"
-      :images="collection.images"/>
+      :images="collection.images"
+      :scale-images="scaleImages"/>
   </div>
 </template>
 
@@ -17,10 +18,12 @@ import DisplayImage from '../DisplayImage';
 @Component({
   props: {
     collections: Array,
+    scaleImages: Boolean,
   },
 })
 export default class CollectionViewer extends Vue {
   collections: Collection[];
+  scaleImages: boolean;
   selectedIndex: number = -1;
 
   setSelectedGroup(index: number): void {
@@ -29,7 +32,7 @@ export default class CollectionViewer extends Vue {
       this.selectedIndex = index;
 
       // Focus on the image viewer element so the bound keyboard events work.
-      const imageViewer: Vue = (<any>this.$refs.imageViewer)[index];
+      const imageViewer = (<any>this.$refs.imageViewer)[index] as Vue;
       requestAnimationFrame(() => {
         imageViewer.$el.focus();
       });

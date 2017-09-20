@@ -7,10 +7,10 @@
     @mousemove="handleUserAction"
     @mousedown="handleUserAction">
     <help-menu />
-    <settings-menu @layoutchange="handleLayoutChange" />
+    <settings-menu @layoutchange="handleLayoutChange" @retinachange="handleRetinaChange" />
     <main @dragover="handleDragHover" @dragleave="handleDragCancel" @drop="handleDrop">
       <welcome-screen v-if="!hasContent" :can-drop="canDrop"/>
-      <collection-viewer v-if="hasContent" :collections="collections"/>
+      <collection-viewer v-if="hasContent" :collections="collections" :scale-images="isScaledImageMode" />
     </main>
   </div>
 </template>
@@ -37,6 +37,7 @@ export default class App extends Vue {
   hasContent: boolean = false;
   canDrop: boolean = false;
   isCenteredImageMode: boolean = true;
+  isScaledImageMode: boolean = false;
 
   // Activity watcher.
   isUserActive: boolean = false;
@@ -193,6 +194,10 @@ export default class App extends Vue {
 
   handleLayoutChange(isCenteredLayout: boolean): void {
     this.isCenteredImageMode = isCenteredLayout;
+  }
+
+  handleRetinaChange(isHalfSize: boolean): void {
+    this.isScaledImageMode = isHalfSize;
   }
 
   /*

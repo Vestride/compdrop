@@ -20,6 +20,12 @@
                   @change="layoutChange">
                 <label for="checkbox-centered-layout">Center images (turn off to scroll them)</label>
               </div>
+              <div>
+                <input type="checkbox" id="checkbox-retina"
+                  :checked="retina"
+                  @change="retinaChange">
+                <label for="checkbox-retina">Scale images to half size</label>
+              </div>
             </div>
           </div>
         </div>
@@ -37,6 +43,7 @@ import Dialog from '../dialog';
 export default class SettingsMenu extends Vue {
   dialog: Dialog;
   centeredLayout: boolean = true;
+  retina: boolean = false;
 
   toggle(): void {
     if (this.dialog.isOpen) {
@@ -60,6 +67,12 @@ export default class SettingsMenu extends Vue {
     const target = event.target as HTMLInputElement;
     this.centeredLayout = target.checked;
     this.$emit('layoutchange', this.centeredLayout);
+  }
+
+  retinaChange(event: Event): void {
+    const target = event.target as HTMLInputElement;
+    this.retina = target.checked;
+    this.$emit('retinachange', this.retina);
   }
 }
 </script>

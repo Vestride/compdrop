@@ -21,6 +21,7 @@ import Vue from 'vue';
 import Component from 'vue-class-component';
 import DisplayImage from './DisplayImage';
 import Collection from './Collection';
+import readDroppedItems from './FileDropReader';
 
 let count = 0;
 function uniqueId(): number {
@@ -46,6 +47,7 @@ export default class App extends Vue {
 
   _handleDragHover(evt: DragEvent): void {
     evt.preventDefault();
+    evt.dataTransfer.dropEffect = 'copy';
     this.canDrop = true;
   }
 
@@ -56,12 +58,20 @@ export default class App extends Vue {
 
   _handleDrop(evt: DragEvent): void {
     evt.preventDefault();
-    this._addFileList(evt.dataTransfer.files);
+
+    readDroppedItems(evt.dataTransfer.items).then((collections: File[][]) => {
+      collections.forEach(files => this._addFileList(files));
+    });
+
+    // const fileList = Array.from(evt.dataTransfer.files);
+    // console.log('drop:', Array.from(fileList));
+    // console.log('more:', Array.from(files));
+    // this._addFileList(fileList);
   }
 
-  _addFileList(fileList: FileList): void {
+  _addFileList(fileList: File[]): void {
     // Filter out non-images and sort by file name.
-    const files = Array.from(fileList)
+    const files = fileList
       .filter((file: File): boolean => file.type.includes('image/'))
       .sort((a: File, b: File): number => a.name.localeCompare(b.name));
 

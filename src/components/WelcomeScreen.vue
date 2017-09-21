@@ -31,7 +31,7 @@ export default class WelcomeScreen extends Vue {
 
   handleFiles(evt: Event): void {
     const target = evt.target as HTMLInputElement;
-    this.$emit('fileschosen', target.files);
+    this.$emit('fileschosen', Array.from(target.files));
     target.value = '';
   }
 }

@@ -16,7 +16,7 @@
             <div v-for="(collection, i) in collections" class="row"
               :key="collection.id">
               <h3 class="col-6@xs col-12@sm type-header-3 collections-menu__title">
-                <span>Collection {{ i + 1 }}</span>
+                <span>{{ collection.name || `Collection ${i + 1}` }}</span>
                 <small v-show="i === selectedCollectionIndex">[current]</small>
               </h3>
               <div class="col-1@xs col-1@sm" v-for="(image, j) in collection.images" :key="image.id">

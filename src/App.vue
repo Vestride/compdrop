@@ -21,6 +21,7 @@ import Vue from 'vue';
 import Component from 'vue-class-component';
 import DisplayImage from './DisplayImage';
 import Collection from './Collection';
+import FileCollection from './FileCollection';
 import { readDroppedItems, readFileAsDataURL, isImageFile } from './FileDropReader';
 
 let count = 0;
@@ -59,29 +60,29 @@ export default class App extends Vue {
   _handleDrop(evt: DragEvent): void {
     evt.preventDefault();
 
-    readDroppedItems(evt.dataTransfer.items).then((collections: File[][]) => {
-      collections.forEach((files) => {
-        this._addFileList(files);
+    readDroppedItems(evt.dataTransfer.items).then((collections: FileCollection[]) => {
+      collections.forEach((collection: FileCollection) => {
+        this._addFileList(collection);
       });
     });
   }
 
-  _addFileList(fileList: File[]): void {
+  _addFileList(fileCollection: FileCollection, collectionName: string = ''): void {
     // Filter out non-images and sort by file name.
-    const files = fileList
+    const files = fileCollection.files
       .filter(isImageFile)
       .sort((a: File, b: File): number => a.name.localeCompare(b.name));
 
     if (files.length > 0) {
       // Async load all files with a FileReader and update the images array when done.
-      this.renderFirstImageThenOthers(files);
+      this.renderFirstImageThenOthers(files, fileCollection.name);
     }
 
     // Hide drop messaging.
     this.canDrop = false;
   }
 
-  async renderFirstImageThenOthers(files: File[]): Promise<void> {
+  async renderFirstImageThenOthers(files: File[], collectionName: string): Promise<void> {
     const collectionId = uniqueId();
     // Remove the first file from the array.
     const first = files.shift();
@@ -92,6 +93,7 @@ export default class App extends Vue {
     const collectionIndex = this.collections.length;
     this.collections[collectionIndex] = {
       id: collectionId,
+      name: collectionName,
       images: [image],
     };
 
@@ -104,6 +106,7 @@ export default class App extends Vue {
       Promise.all(this.getDisplayImages(files)).then((images) => {
         this.collections.splice(collectionIndex, 1, {
           id: this.collections[collectionIndex].id,
+          name: this.collections[collectionIndex].name,
           images: this.collections[collectionIndex].images.concat(images),
         });
         this.updatePageTitle();

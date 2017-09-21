@@ -1,3 +1,5 @@
+import FileCollection from './FileCollection';
+
 // https://wicg.github.io/entries-api/#api-directoryreader
 interface FileSystemDirectoryReader {
   readEntries(successCallback: (entries: FileSystemEntry[]) => void, errorCallback?: () => void): void;
@@ -48,7 +50,8 @@ function getFile(entry: FileSystemEntry): Promise<File> {
   });
 }
 
-function getFilesFromDirectoryEntry(entry: FileSystemEntry, collections: File[][] = []): Promise<File[][]> {
+function getFilesFromDirectoryEntry(entry: FileSystemEntry, collections: FileCollection[] = []): Promise<FileCollection[]> {
+  const directoryName = getDirectoryName(entry.fullPath);
   return new Promise((resolve) => {
     entry.createReader().readEntries((entries: FileSystemEntry[]) => {
       // Split files and directories apart.
@@ -56,8 +59,12 @@ function getFilesFromDirectoryEntry(entry: FileSystemEntry, collections: File[][
 
       // Once all the initial files have been read, add them to the collections
       // array and start reading directories.
-      Promise.all(parts[0].map(getFile)).then((files) => {
-        collections.push(files);
+      Promise.all(parts[0].map(getFile)).then((files: File[]) => {
+        const fileCollection: FileCollection = {
+          name: directoryName,
+          files: files,
+        };
+        collections.push(fileCollection);
         // Recursively read directories.
         const directories = parts[1].map(entry => getFilesFromDirectoryEntry(entry, collections));
         // Since the collections array is passed as an argument and mutated
@@ -69,6 +76,11 @@ function getFilesFromDirectoryEntry(entry: FileSystemEntry, collections: File[][
       });
     });
   });
+}
+
+function getDirectoryName(fullPath: string): string {
+  const pathPieces = fullPath.split('/');
+  return pathPieces[pathPieces.length - 1] || '';
 }
 
 function getFileExtension(fileName: string): string {
@@ -118,7 +130,7 @@ export function readFileAsDataURL(file: File): Promise<string> {
   });
 }
 
-export function readDroppedItems(itemList: DataTransferItemList): Promise<File[][]> {
+export function readDroppedItems(itemList: DataTransferItemList): Promise<FileCollection[]> {
   // https://developer.mozilla.org/en-US/docs/Web/API/DataTransferItem/webkitGetAsEntry
   const entries = Array.from(itemList)
     .map(item => item.webkitGetAsEntry())
@@ -131,10 +143,20 @@ export function readDroppedItems(itemList: DataTransferItemList): Promise<File[]
     Promise.all(dirs.map(entry => getFilesFromDirectoryEntry(entry))),
   ]).then((result) => {
     const looseFiles: File[] = result[0];
-    const groups: File[][][] = result[1];
+    const groups: FileCollection[][] = result[1];
+
+    // At this point, there we have an array which is 3 levels deep.
+    // * Top level is the user's selection which they dropped.
+    //   * Next is a grouping of collections by directory
+    //     * Finally, the array of files in that directory.
     const collections = flattenOnce(groups);
+
+    // Add loose files to the front.
     if (looseFiles.length) {
-      collections.unshift(looseFiles);
+      collections.unshift({
+        name: '',
+        files: looseFiles,
+      });
     }
 
     return collections;

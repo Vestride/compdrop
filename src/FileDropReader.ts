@@ -31,6 +31,15 @@ function partition<T>(collection: T[], predicate: (item: T) => boolean): T[][] {
 }
 
 /**
+ * Flatten an array, but only a single level deep.
+ */
+function flattenOnce<T>(collection: T[][]): T[] {
+  return collection.reduce((result: T[], collection: T[]) => {
+    return result.concat(collection);
+  }, []);
+}
+
+/**
  * Get a File instance from an entry instance.
  */
 function getFile(entry: FileSystemEntry): Promise<File> {
@@ -62,30 +71,72 @@ function getFilesFromDirectoryEntry(entry: FileSystemEntry, collections: File[][
   });
 }
 
-function readItem(item: DataTransferItem): Promise<File[][]> {
-  // https://developer.mozilla.org/en-US/docs/Web/API/DataTransferItem/webkitGetAsEntry
-  const entry = item.webkitGetAsEntry();
-
-  // If it's only a file, convert it to an array of array of files.
-  if (entry.isFile) {
-    return getFile(entry).then(file => ([[file]]));
+function getFileExtension(fileName: string): string {
+  const matches = fileName && fileName.match(/\.([^.]+)$/);
+  if (matches) {
+    return matches[1].toLowerCase();
   }
 
-  return getFilesFromDirectoryEntry(entry);
+  return '';
 }
 
-export default function readDroppedItems(itemList: DataTransferItemList): Promise<File[][]> {
-  const items = Array.from(itemList)
-    .filter(item => item.webkitGetAsEntry())
-    .map(readItem);
+const VALID_IMAGE_EXTENSIONS = [
+  'bmp',
+  'gif',
+  'jpeg',
+  'jpg',
+  'jpe',
+  'png',
+  'svg',
+  'tiff',
+  'tif',
+  'webp',
+  'ico',
+];
 
-  // At this point, there we have an array which is 3 levels deep.
-  // * Top level is the user's selection which they dropped.
-  //   * Next is a grouping of collections by directory
-  //     * Finally, the array of files in that directory.
-  return Promise.all(items).then((groups: File[][][]) => {
-    return groups.reduce((collections: File[][], collection: File[][]) => {
-      return collections.concat(collection);
-    }, []);
+export function isImageFile(file: File): boolean {
+  // Firefox doesn't support the `type` property - it's empty.
+  if (file.type && file.type.includes('image/')) {
+    return true;
+  }
+
+  const extension = getFileExtension(file.name);
+  return VALID_IMAGE_EXTENSIONS.includes(extension);
+}
+
+export function readFileAsDataURL(file: File): Promise<string> {
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+
+    // Resolve promise when the reader finishes.
+    reader.onload = () => {
+      resolve(reader.result as string);
+    };
+
+    // Start reader.
+    reader.readAsDataURL(file);
+  });
+}
+
+export function readDroppedItems(itemList: DataTransferItemList): Promise<File[][]> {
+  // https://developer.mozilla.org/en-US/docs/Web/API/DataTransferItem/webkitGetAsEntry
+  const entries = Array.from(itemList)
+    .map(item => item.webkitGetAsEntry())
+    .filter(entry => !!entry);
+
+  const [files, dirs] = partition(entries, (entry: FileSystemEntry) => entry.isFile);
+
+  return Promise.all([
+    Promise.all(files.map(getFile)),
+    Promise.all(dirs.map(entry => getFilesFromDirectoryEntry(entry))),
+  ]).then((result) => {
+    const looseFiles: File[] = result[0];
+    const groups: File[][][] = result[1];
+    const collections = flattenOnce(groups);
+    if (looseFiles.length) {
+      collections.unshift(looseFiles);
+    }
+
+    return collections;
   });
 }

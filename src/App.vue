@@ -21,7 +21,7 @@ import Vue from 'vue';
 import Component from 'vue-class-component';
 import DisplayImage from './DisplayImage';
 import Collection from './Collection';
-import readDroppedItems from './FileDropReader';
+import { readDroppedItems, readFileAsDataURL, isImageFile } from './FileDropReader';
 
 let count = 0;
 function uniqueId(): number {
@@ -60,19 +60,16 @@ export default class App extends Vue {
     evt.preventDefault();
 
     readDroppedItems(evt.dataTransfer.items).then((collections: File[][]) => {
-      collections.forEach(files => this._addFileList(files));
+      collections.forEach((files) => {
+        this._addFileList(files);
+      });
     });
-
-    // const fileList = Array.from(evt.dataTransfer.files);
-    // console.log('drop:', Array.from(fileList));
-    // console.log('more:', Array.from(files));
-    // this._addFileList(fileList);
   }
 
   _addFileList(fileList: File[]): void {
     // Filter out non-images and sort by file name.
     const files = fileList
-      .filter((file: File): boolean => file.type.includes('image/'))
+      .filter(isImageFile)
       .sort((a: File, b: File): number => a.name.localeCompare(b.name));
 
     if (files.length > 0) {
@@ -119,22 +116,12 @@ export default class App extends Vue {
   }
 
   getDisplayImage(file: File): Promise<DisplayImage> {
-    const id = uniqueId();
-    const filename = file.name;
-    return new Promise((resolve) => {
-      const reader = new FileReader();
-
-      // Resolve promise when the reader finishes.
-      reader.onload = () => {
-        resolve({
-          id,
-          filename,
-          src: reader.result,
-        });
+    return readFileAsDataURL(file).then((dataURL: string) => {
+      return {
+        id: uniqueId(),
+        filename: file.name,
+        src: dataURL,
       };
-
-      // Start reader.
-      reader.readAsDataURL(file)
     });
   }
 

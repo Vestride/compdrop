@@ -82,6 +82,10 @@ export default class ImageViewer extends Vue {
     background-color: rgb(240, 240, 240);
   }
 
+  .image-viewer__images {
+    user-select: none;
+  }
+
   .layout-centered .image-viewer__images {
     display: flex;
     justify-content: center;
@@ -89,7 +93,6 @@ export default class ImageViewer extends Vue {
 
   .image-viewer__img {
     transform-origin: top center;
-    user-select: none;
     max-width: none;
   }
 

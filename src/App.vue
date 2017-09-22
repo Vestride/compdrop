@@ -60,11 +60,19 @@ export default class App extends Vue {
   _handleDrop(evt: DragEvent): void {
     evt.preventDefault();
 
-    readDroppedItems(evt.dataTransfer.items).then((collections: FileCollection[]) => {
-      collections.forEach((collection: FileCollection) => {
-        this._addFileList(collection);
+    // Safari and IE don't support `items` property.
+    if (evt.dataTransfer.items) {
+      readDroppedItems(evt.dataTransfer.items).then((collections: FileCollection[]) => {
+        collections.forEach((collection: FileCollection) => {
+          this._addFileList(collection);
+        });
       });
-    });
+    } else {
+      this._addFileList({
+        name: '',
+        files: Array.from(evt.dataTransfer.files),
+      });
+    }
   }
 
   _addFileList(fileCollection: FileCollection, collectionName: string = ''): void {

@@ -8,7 +8,7 @@
     @mousedown="handleUserAction">
     <help-menu />
     <settings-menu @layoutchange="handleLayoutChange" @retinachange="handleRetinaChange" />
-    <collection-menu v-if="hasContent" :collections="collections" />
+    <collections-menu v-show="hasContent" :collections="collections" />
     <main>
       <welcome-screen v-if="!hasContent" :can-drop="canDrop" @fileschosen="_addFileList" />
       <collection-viewer v-if="hasContent" :collections="collections" :scale-images="isScaledImageMode" />

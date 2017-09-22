@@ -67,7 +67,7 @@ export default class CollectionsMenu extends Vue {
   }
 
   getSelectedImages(): number[] {
-    let i: number[];
+    let i: number[] = [];
     bus.$emit('getselectedimages', (indices: number[]) => {
       i = indices;
     });

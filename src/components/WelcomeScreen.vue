@@ -1,13 +1,13 @@
 <template>
   <div class="welcome-screen" :class="{ 'welcome-screen--can-drop': canDrop }">
     <div class="welcome-screen__inner">
-      <div class="type--center" v-if="!canDrop">
+      <div class="type--center" v-show="!canDrop">
         <p class="type-header-1">Drop images here.</p>
         <p>png, jpg, gif, bmp</p>
         <p><label class="btn" for="file-input">Choose files</label></p>
         <input type="file" accept="image/*" multiple class="welcome-screen__file-input" @change="handleFiles" id="file-input">
       </div>
-      <div v-if="canDrop">
+      <div v-show="canDrop">
         <p class="type-header-1">Release!</p>
       </div>
     </div>

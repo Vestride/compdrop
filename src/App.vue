@@ -2,6 +2,7 @@
   <div id="app" :class="{
     'layout-centered': isCenteredImageMode,
     'user-inactive': !isUserActive,
+    'is-loading': isLoading,
   }"
     tabindex="-1"
     @mousemove="handleUserAction"
@@ -10,8 +11,9 @@
     <settings-menu @layoutchange="handleLayoutChange" @retinachange="handleRetinaChange" />
     <collections-menu v-show="hasContent" :collections="collections" />
     <main>
-      <welcome-screen v-if="!hasContent" :can-drop="canDrop" @fileschosen="_addFileList" />
-      <collection-viewer v-if="hasContent" :collections="collections" :scale-images="isScaledImageMode" />
+      <welcome-screen v-show="!hasContent" :can-drop="canDrop" @fileschosen="_addFileList" />
+      <loading-screen v-show="isLoading" />
+      <collection-viewer v-show="hasContent" :collections="collections" :scale-images="isScaledImageMode" />
     </main>
   </div>
 </template>
@@ -39,6 +41,7 @@ export default class App extends Vue {
   collections: Collection[] = [];
   hasContent: boolean = false;
   canDrop: boolean = false;
+  isLoading: boolean = false;
   isCenteredImageMode: boolean = true;
   isScaledImageMode: boolean = false;
 
@@ -60,34 +63,49 @@ export default class App extends Vue {
   _handleDrop(evt: DragEvent): void {
     evt.preventDefault();
 
+    this.isLoading = true;
+    const start = Date.now();
+
+    const done = () => {
+      this.isLoading = false;
+      requestAnimationFrame(() => {
+        console.log(`Drop took ${Date.now() - start} milliseconds`)
+      });
+    };
+
     // Safari and IE don't support `items` property.
     if (evt.dataTransfer.items) {
       readDroppedItems(evt.dataTransfer.items).then((collections: FileCollection[]) => {
-        collections.forEach((collection: FileCollection) => {
-          this._addFileList(collection);
-        });
+        Promise.all(collections.map(this._addFileList)).then(done);
       });
     } else {
-      this._addFileList({
+      const fileCollection: FileCollection = {
         name: '',
         files: Array.from(evt.dataTransfer.files),
-      });
+      };
+      this._addFileList(fileCollection).then(done);
     }
   }
 
-  _addFileList(fileCollection: FileCollection, collectionName: string = ''): void {
+  _addFileList(fileCollection: FileCollection): Promise<void> {
     // Filter out non-images and sort by file name.
     const files = fileCollection.files
       .filter(isImageFile)
       .sort((a: File, b: File): number => a.name.localeCompare(b.name));
 
+    let promise;
+
     if (files.length > 0) {
       // Async load all files with a FileReader and update the images array when done.
-      this.renderFirstImageThenOthers(files, fileCollection.name);
+      promise = this.renderFirstImageThenOthers(files, fileCollection.name);
+    } else {
+      promise = Promise.resolve();
     }
 
     // Hide drop messaging.
     this.canDrop = false;
+
+    return promise;
   }
 
   async renderFirstImageThenOthers(files: File[], collectionName: string): Promise<void> {
@@ -110,14 +128,17 @@ export default class App extends Vue {
     this.hasContent = this.collections.length > 0 || files.length > 0;
 
     // Wait a frame, then start reading the remaining files.
-    requestAnimationFrame(() => {
-      Promise.all(this.getDisplayImages(files)).then((images) => {
-        this.collections.splice(collectionIndex, 1, {
-          id: this.collections[collectionIndex].id,
-          name: this.collections[collectionIndex].name,
-          images: this.collections[collectionIndex].images.concat(images),
+    return new Promise<void>((resolve) => {
+      requestAnimationFrame(() => {
+        Promise.all(this.getDisplayImages(files)).then((images) => {
+          this.collections.splice(collectionIndex, 1, {
+            id: this.collections[collectionIndex].id,
+            name: this.collections[collectionIndex].name,
+            images: this.collections[collectionIndex].images.concat(images),
+          });
+          this.updatePageTitle();
+          resolve();
         });
-        this.updatePageTitle();
       });
     });
   }

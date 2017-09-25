@@ -11,7 +11,7 @@
     <settings-menu @layoutchange="handleLayoutChange" @retinachange="handleRetinaChange" />
     <collections-menu v-show="hasContent" :collections="collections" />
     <main>
-      <welcome-screen v-show="!hasContent" :can-drop="canDrop" @fileschosen="_addFileList" />
+      <welcome-screen v-show="!hasContent" :can-drop="canDrop" @fileschosen="_handleFilesChosen" />
       <loading-screen v-show="isLoading" />
       <collection-viewer v-show="hasContent" :collections="collections" :scale-images="isScaledImageMode" />
     </main>
@@ -85,6 +85,13 @@ export default class App extends Vue {
       };
       this._addFileList(fileCollection).then(done);
     }
+  }
+
+  _handleFilesChosen(files: File[]): void {
+    this._addFileList({
+      name: '',
+      files: files,
+    });
   }
 
   _addFileList(fileCollection: FileCollection): Promise<void> {

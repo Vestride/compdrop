@@ -117,11 +117,13 @@ export function isImageFile(file: File): boolean {
 }
 
 export function readFileAsDataURL(file: File): Promise<string> {
+  const start = Date.now();
   return new Promise((resolve) => {
     const reader = new FileReader();
 
     // Resolve promise when the reader finishes.
     reader.onload = () => {
+      console.log(`Read took ${Date.now() - start} milliseconds`)
       resolve(reader.result as string);
     };
 

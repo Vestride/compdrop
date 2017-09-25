@@ -1,5 +1,5 @@
 <template>
-  <div class="loading-screen">
+  <div class="loading-screen" v-once>
     <div class="loading-screen__inner">
       <h2 class="type-header-2 marginless loading-screen__text">Loading files</h2>
     </div>

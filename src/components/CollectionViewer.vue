@@ -53,7 +53,10 @@ export default class CollectionViewer extends Vue {
 
     bus.$on('getselectedimages', (fn: (indices: number[]) => void) => {
       const viewers = (this.$refs.imageViewer as ImageViewer[]);
-      const indices = viewers.map((imageViewer: ImageViewer) => imageViewer.selectedIndex);
+      if (viewers) {}
+      const indices = viewers ?
+        viewers.map((imageViewer: ImageViewer) => imageViewer.selectedIndex) :
+        [];
       fn(indices);
     });
 

@@ -1,5 +1,5 @@
 <template>
-  <dl class="unstyled-list shortcut-list">
+  <dl class="unstyled-list shortcut-list" v-once>
     <template v-for="item in shortcuts">
       <dt class="shortcut-item__triggers" :key="item.desc">
         <kbd v-for="trigger in item.keys" :key="trigger">{{ trigger }}</kbd>

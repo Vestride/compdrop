@@ -7,12 +7,16 @@
       @keydown.right.prevent="handleNextTrigger"
       @keydown.74.prevent="handleNextTrigger">
     <div class="image-viewer__images">
-      <img v-for="(displayImage, i) in images" class="image-viewer__img"
+      <div v-for="(displayImage, i) in images"
+        class="image-viewer__wrap"
         :class="{ hidden: i !== selectedIndex }"
-        :src="displayImage.src"
-        :alt="displayImage.filename"
-        :key="displayImage.id"
-        :style="{ transform: scaleImages ? 'scale(0.5)' : 'none' }" />
+        :style="{ transform: scaleImages ? 'scale(0.5)' : 'none' }"
+        :key="displayImage.id">
+        <img class="image-viewer__img"
+          v-once
+          :src="displayImage.src"
+          :alt="displayImage.filename" />
+      </div>
     </div>
     <button aria-label="next image" class="nav-button nav-button--next fade-when-inactive" @click.stop="handleNextTrigger">
       <svg viewBox="75.4 27 461.2 738"><path d="M167.7 27l368.9 369-368.9 369-92.3-92.3 276.7-276.7-276.7-276.7z"></path></svg>
@@ -91,8 +95,11 @@ export default class ImageViewer extends Vue {
     justify-content: center;
   }
 
-  .image-viewer__img {
+  .image-viewer__wrap {
     transform-origin: top center;
+  }
+
+  .image-viewer__img {
     max-width: none;
   }
 

@@ -1,6 +1,6 @@
 <template>
   <div id="app" :class="{
-    'layout-centered': isCenteredImageMode,
+    'layout-centered': $store.state.settings.isCenteredImageMode,
     'user-inactive': !isUserActive,
     'is-loading': isLoading,
   }"
@@ -8,12 +8,12 @@
     @mousemove="handleUserAction"
     @mousedown="handleUserAction">
     <help-menu />
-    <settings-menu @layoutchange="handleLayoutChange" @retinachange="handleRetinaChange" />
+    <settings-menu />
     <collections-menu v-show="hasContent" />
     <main>
       <welcome-screen v-show="!hasContent" :can-drop="canDrop" @fileschosen="_handleFilesChosen" />
       <loading-screen v-show="isLoading" />
-      <collection-viewer v-show="hasContent" :scale-images="isScaledImageMode" />
+      <collection-viewer v-show="hasContent" />
     </main>
   </div>
 </template>
@@ -37,8 +37,6 @@ export default class App extends Vue {
   hasContent: boolean = false;
   canDrop: boolean = false;
   isLoading: boolean = false;
-  isCenteredImageMode: boolean = true;
-  isScaledImageMode: boolean = false;
 
   // Activity watcher.
   isUserActive: boolean = false;
@@ -225,14 +223,6 @@ export default class App extends Vue {
     this.timer = setTimeout(() => {
       this.isUserActive = false;
     }, 3000);
-  }
-
-  handleLayoutChange(isCenteredLayout: boolean): void {
-    this.isCenteredImageMode = isCenteredLayout;
-  }
-
-  handleRetinaChange(isHalfSize: boolean): void {
-    this.isScaledImageMode = isHalfSize;
   }
 };
 </script>

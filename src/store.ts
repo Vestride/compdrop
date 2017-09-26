@@ -37,7 +37,13 @@ export default new Vuex.Store({
     selectImage(state: State, payload: { index: number, collectionIndex: number }): void {
       Vue.set(state.selectedImages, payload.collectionIndex, payload.index);
       state.selectedCollectionIndex = payload.collectionIndex;
-    }
+    },
+    setIsCenteredImageMode(state: State, payload: boolean): void {
+      state.settings.isCenteredImageMode = payload;
+    },
+    setIsScaledImageMode(state: State, payload: boolean): void {
+      state.settings.isScaledImageMode = payload;
+    },
   },
   getters: {
     totalCollections(state: State): number {

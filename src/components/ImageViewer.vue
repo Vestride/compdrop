@@ -10,7 +10,7 @@
       <div v-for="(displayImage, i) in images"
         class="image-viewer__wrap"
         :class="{ hidden: i !== selectedIndex }"
-        :style="{ transform: scaleImages ? 'scale(0.5)' : 'none' }"
+        :style="{ transform: $store.state.settings.isScaledImageMode ? 'scale(0.5)' : 'none' }"
         :key="displayImage.id">
         <img class="image-viewer__img"
           :src="displayImage.src"
@@ -34,11 +34,9 @@ import DisplayImage from '../DisplayImage';
 @Component({
   props: {
     collectionIndex: Number,
-    scaleImages: Boolean,
   },
 })
 export default class ImageViewer extends Vue {
-  scaleImages: boolean;
   collectionIndex: number;
 
   get images(): DisplayImage[] {
@@ -100,8 +98,12 @@ export default class ImageViewer extends Vue {
     justify-content: center;
   }
 
-  .image-viewer__wrap {
+  .layout-centered .image-viewer__wrap {
     transform-origin: top center;
+  }
+
+  .image-viewer__wrap {
+    transform-origin: top left;
   }
 
   .image-viewer__img {

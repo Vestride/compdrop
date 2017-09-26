@@ -4,8 +4,7 @@
       v-for="(collection, i) in $store.state.collections"
       :key="collection.id"
       :class="{ hidden: i !== selectedIndex }"
-      :collection-index="i"
-      :scale-images="scaleImages"/>
+      :collection-index="i"/>
   </div>
 </template>
 
@@ -16,13 +15,8 @@ import Collection from '../Collection';
 import DisplayImage from '../DisplayImage';
 import ImageViewer from './ImageViewer.vue';
 
-@Component({
-  props: {
-    scaleImages: Boolean,
-  },
-})
+@Component
 export default class CollectionViewer extends Vue {
-  scaleImages: boolean;
 
   get selectedIndex(): number {
     return this.$store.state.selectedCollectionIndex;

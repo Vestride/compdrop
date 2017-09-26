@@ -42,8 +42,14 @@ import Dialog from '../Dialog';
 @Component
 export default class SettingsMenu extends Vue {
   dialog: Dialog;
-  centeredLayout: boolean = true;
-  retina: boolean = false;
+
+  get centeredLayout(): boolean {
+    return this.$store.state.settings.isCenteredImageMode;
+  }
+
+  get retina(): boolean {
+    return this.$store.state.settings.isScaledImageMode;
+  }
 
   toggle(): void {
     if (this.dialog.isOpen) {
@@ -65,14 +71,12 @@ export default class SettingsMenu extends Vue {
 
   layoutChange(event: Event): void {
     const target = event.target as HTMLInputElement;
-    this.centeredLayout = target.checked;
-    this.$emit('layoutchange', this.centeredLayout);
+    this.$store.commit('setIsCenteredImageMode', target.checked);
   }
 
   retinaChange(event: Event): void {
     const target = event.target as HTMLInputElement;
-    this.retina = target.checked;
-    this.$emit('retinachange', this.retina);
+    this.$store.commit('setIsScaledImageMode', target.checked);
   }
 }
 </script>

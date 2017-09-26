@@ -13,16 +13,16 @@
             <h2 class="type-header-2 marginless" id="collections-dialog-title">Collections</h2>
           </div>
           <div class="dialog-content">
-            <div v-for="(collection, i) in collections" class="row"
+            <div v-for="(collection, i) in $store.state.collections" class="row"
               :key="collection.id">
               <h3 class="col-6@xs col-12@sm type-header-3 collections-menu__title">
                 <span>{{ collection.name || `Collection ${i + 1}` }}</span>
-                <small v-show="i === selectedCollectionIndex">[current]</small>
+                <small v-show="i === $store.state.selectedCollectionIndex">[current]</small>
               </h3>
               <div class="col-1@xs col-1@sm" v-for="(image, j) in collection.images" :key="image.id">
                 <button class="collections-menu__thumb-btn" @click="select(i, j)">
                   <img class="collections-menu__thumb"
-                    :class="{ 'collections-menu__thumb--selected': j === selectedImages[i] }"
+                    :class="{ 'collections-menu__thumb--selected': j === $store.state.selectedImages[i] }"
                     :src="image.src"
                     :alt="image.filename"
                     :title="image.filename" />
@@ -41,39 +41,10 @@ import Vue from 'vue';
 import Component from 'vue-class-component';
 import Dialog from '../Dialog';
 import Collection from '../Collection';
-import bus from '../Events';
 
-@Component({
-  props: {
-    collections: {
-      type: Array,
-      required: true,
-    },
-  },
-})
+@Component
 export default class CollectionsMenu extends Vue {
-  collections: Collection[];
   dialog: Dialog;
-  selectedCollectionIndex: number = 0;
-  selectedImages: number[] = [];
-
-  getSelectedCollection(): number {
-    let i: number;
-    bus.$emit('getselectedcollection', (index: number) => {
-      i = index;
-    });
-
-    return i;
-  }
-
-  getSelectedImages(): number[] {
-    let i: number[] = [];
-    bus.$emit('getselectedimages', (indices: number[]) => {
-      i = indices;
-    });
-
-    return i;
-  }
 
   toggle(): void {
     if (this.dialog.isOpen) {
@@ -83,36 +54,22 @@ export default class CollectionsMenu extends Vue {
     }
   }
 
-  update(): void {
-    this.selectedCollectionIndex = this.getSelectedCollection();
-    this.selectedImages = this.getSelectedImages();
-  }
-
   select(collectionIndex: number, imageIndex: number): void {
-    bus.$emit('setselectedcollection', {
-      collection: collectionIndex,
-      image: imageIndex,
+    this.$store.commit('selectImage', {
+      index: imageIndex,
+      collectionIndex: collectionIndex,
     });
-
     this.dialog.close();
   }
 
   mounted(): void {
     this.$parent.$on('collectionstoggle', this.toggle);
-    bus.$on('collectionchanged', this.update)
     this.dialog = new Dialog(document.getElementById('collections-dialog'));
-
-    this.$watch('collections', (newCollections: Collection[], oldCollections: Collection[]) => {
-      this.update();
-    });
-
-    this.update();
   }
 
   beforeDestroy(): void {
     this.dialog.dispose();
     this.dialog = null;
-    this.$off('collectionchanged', this.update);
   }
 }
 </script>

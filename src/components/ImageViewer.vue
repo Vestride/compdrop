@@ -13,7 +13,6 @@
         :style="{ transform: scaleImages ? 'scale(0.5)' : 'none' }"
         :key="displayImage.id">
         <img class="image-viewer__img"
-          v-once
           :src="displayImage.src"
           :alt="displayImage.filename" />
       </div>
@@ -34,27 +33,33 @@ import DisplayImage from '../DisplayImage';
 
 @Component({
   props: {
-    images: Array,
+    collectionIndex: Number,
     scaleImages: Boolean,
   },
 })
 export default class ImageViewer extends Vue {
-  images: DisplayImage[];
   scaleImages: boolean;
-  selectedIndex: number = 0;
+  collectionIndex: number;
+
+  get images(): DisplayImage[] {
+    return this.$store.state.collections[this.collectionIndex].images;
+  }
+
+  get selectedIndex(): number {
+    return this.$store.state.selectedImages[this.collectionIndex];
+  }
 
   setSelectedIndex(index: number, scrollToTop: boolean = true): void {
     if (index >= 0 || index < this.images.length) {
-      this.selectedIndex = index;
+      this.$store.commit('selectImage', {
+        index: index,
+        collectionIndex: this.collectionIndex,
+      });
 
       if (scrollToTop) {
         window.scrollTo(0, 0);
       }
     }
-  }
-
-  getSelectedIndex(): number {
-    return this.selectedIndex;
   }
 
   handleNextTrigger(evt: MouseEvent | KeyboardEvent): void {

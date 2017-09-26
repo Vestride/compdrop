@@ -15,7 +15,8 @@
     "@odopod/odo-dialog": "^1.1.1",
     "tslib": "^1.7.1",
     "vue": "^2.3.3",
-    "vue-class-component": "^5.0.2"
+    "vue-class-component": "^5.0.2",
+    "vuex": "^2.4.0"
   },
   "devDependencies": {
     "autoprefixer": "^7.1.2",

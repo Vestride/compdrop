@@ -9,11 +9,11 @@
     @mousedown="handleUserAction">
     <help-menu />
     <settings-menu @layoutchange="handleLayoutChange" @retinachange="handleRetinaChange" />
-    <collections-menu v-show="hasContent" :collections="collections" />
+    <collections-menu v-show="hasContent" />
     <main>
       <welcome-screen v-show="!hasContent" :can-drop="canDrop" @fileschosen="_handleFilesChosen" />
       <loading-screen v-show="isLoading" />
-      <collection-viewer v-show="hasContent" :collections="collections" :scale-images="isScaledImageMode" />
+      <collection-viewer v-show="hasContent" :scale-images="isScaledImageMode" />
     </main>
   </div>
 </template>
@@ -32,13 +32,8 @@ function uniqueId(): number {
   return count;
 }
 
-function maybePluralize(count: number, noun: string, suffix: string = 's') {
-  return `${count} ${noun}${count !== 1 ? suffix : ''}`;
-}
-
 @Component
 export default class App extends Vue {
-  collections: Collection[] = [];
   hasContent: boolean = false;
   canDrop: boolean = false;
   isLoading: boolean = false;
@@ -123,25 +118,24 @@ export default class App extends Vue {
     // Read the file and update the images property so that Vue re-renders.
     // This intentionally blocks execution for reading the other files.
     const image = await this.getDisplayImage(first);
-    const collectionIndex = this.collections.length;
-    this.collections[collectionIndex] = {
+    const collectionIndex = this.$store.getters.totalCollections as number;
+    this.$store.commit('addCollection', {
       id: collectionId,
       name: collectionName,
       images: [image],
-    };
+    });
 
     // Set flag for whether there was content after the first display image has
     // been read.
-    this.hasContent = this.collections.length > 0 || files.length > 0;
+    this.hasContent = this.$store.state.collections.length > 0 || files.length > 0;
 
     // Wait a frame, then start reading the remaining files.
     return new Promise<void>((resolve) => {
       requestAnimationFrame(() => {
         Promise.all(this.getDisplayImages(files)).then((images) => {
-          this.collections.splice(collectionIndex, 1, {
-            id: this.collections[collectionIndex].id,
-            name: this.collections[collectionIndex].name,
-            images: this.collections[collectionIndex].images.concat(images),
+          this.$store.commit('updateCollectionImages', {
+            index: collectionIndex,
+            images: images,
           });
           this.updatePageTitle();
           resolve();
@@ -164,21 +158,8 @@ export default class App extends Vue {
     });
   }
 
-  getPageTitle(): string {
-    if (this.collections.length > 1) {
-      const totalImages = this.collections.reduce((total, collection) => total + collection.images.length, 0);
-      return `${maybePluralize(this.collections.length, 'collection')} – ${maybePluralize(totalImages, 'image')} – compdrop`;
-    }
-
-    if (this.collections.length > 0) {
-      return `${maybePluralize(this.collections[0].images.length, 'image')} – compdrop`;
-    }
-
-    return 'compdrop';
-  }
-
   updatePageTitle(): void {
-    document.title = this.getPageTitle();
+    document.title = this.$store.getters.pageTitle as string;
   }
 
   mounted(): void {
@@ -233,7 +214,7 @@ export default class App extends Vue {
   }
 
   reset(): void {
-    this.collections = [];
+    this.$store.commit('emptyCollections');
     this.hasContent = false;
   }
 

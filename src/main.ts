@@ -1,4 +1,5 @@
 import Vue from 'vue';
+import Vuex from 'vuex';
 import App from './App.vue';
 import '@odopod/odo-dialog/css/odo-dialog.css';
 import './styles.css';
@@ -10,6 +11,7 @@ import HelpMenu from './components/HelpMenu.vue';
 import SettingsMenu from './components/SettingsMenu.vue';
 import CollectionsMenu from './components/CollectionsMenu.vue';
 import KeyboardShortcuts from './components/KeyboardShortcuts.vue';
+import store from './store';
 
 Vue.config.productionTip = false;
 
@@ -25,6 +27,7 @@ Vue.component('keyboard-shortcuts', KeyboardShortcuts);
 /* eslint-disable no-new */
 new Vue({
   el: '#app',
+  store: store,
   template: '<App/>',
   components: { App },
 });

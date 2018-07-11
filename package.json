@@ -12,14 +12,14 @@
     "test": "npm run unit"
   },
   "dependencies": {
-    "@odopod/odo-dialog": "^1.1.1",
+    "@odopod/odo-dialog": "^2.0.2",
     "tslib": "^1.7.1",
     "vue": "^2.3.3",
-    "vue-class-component": "^5.0.2",
-    "vuex": "^2.4.0"
+    "vue-class-component": "^6.2.0",
+    "vuex": "^3.0.1"
   },
   "devDependencies": {
-    "autoprefixer": "^7.1.2",
+    "autoprefixer": "^8.0.0",
     "babel-core": "^6.22.1",
     "babel-loader": "^7.1.1",
     "babel-plugin-istanbul": "^4.1.1",

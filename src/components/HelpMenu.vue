@@ -35,11 +35,11 @@
 <script lang="ts">
 import Vue from 'vue';
 import Component from 'vue-class-component';
-import Dialog from '../Dialog';
+import OdoDialog from '@odopod/odo-dialog';
 
 @Component
 export default class HelpMenu extends Vue {
-  dialog: Dialog;
+  dialog: OdoDialog;
 
   toggle(): void {
     if (this.dialog.isOpen) {
@@ -51,7 +51,7 @@ export default class HelpMenu extends Vue {
 
   mounted(): void {
     this.$parent.$on('helptoggle', this.toggle);
-    this.dialog = new Dialog(document.getElementById('help-dialog'));
+    this.dialog = new OdoDialog(document.getElementById('help-dialog'));
   }
 
   beforeDestroy(): void {

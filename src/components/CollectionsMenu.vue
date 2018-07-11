@@ -39,12 +39,12 @@
 <script lang="ts">
 import Vue from 'vue';
 import Component from 'vue-class-component';
-import Dialog from '../Dialog';
+import OdoDialog from '@odopod/odo-dialog';
 import Collection from '../Collection';
 
 @Component
 export default class CollectionsMenu extends Vue {
-  dialog: Dialog;
+  dialog: OdoDialog;
 
   toggle(): void {
     if (this.dialog.isOpen) {
@@ -64,7 +64,7 @@ export default class CollectionsMenu extends Vue {
 
   mounted(): void {
     this.$parent.$on('collectionstoggle', this.toggle);
-    this.dialog = new Dialog(document.getElementById('collections-dialog'));
+    this.dialog = new OdoDialog(document.getElementById('collections-dialog'));
   }
 
   beforeDestroy(): void {

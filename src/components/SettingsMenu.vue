@@ -37,11 +37,11 @@
 <script lang="ts">
 import Vue from 'vue';
 import Component from 'vue-class-component';
-import Dialog from '../Dialog';
+import OdoDialog from '@odopod/odo-dialog';
 
 @Component
 export default class SettingsMenu extends Vue {
-  dialog: Dialog;
+  dialog: OdoDialog;
 
   get centeredLayout(): boolean {
     return this.$store.state.settings.isCenteredImageMode;
@@ -61,7 +61,7 @@ export default class SettingsMenu extends Vue {
 
   mounted(): void {
     this.$parent.$on('settingstoggle', this.toggle);
-    this.dialog = new Dialog(document.getElementById('settings-dialog'));
+    this.dialog = new OdoDialog(document.getElementById('settings-dialog'));
   }
 
   beforeDestroy(): void {

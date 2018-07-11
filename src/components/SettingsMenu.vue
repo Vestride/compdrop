@@ -41,7 +41,7 @@ import OdoDialog from '@odopod/odo-dialog';
 
 @Component
 export default class SettingsMenu extends Vue {
-  dialog: OdoDialog;
+  public dialog!: OdoDialog;
 
   get centeredLayout(): boolean {
     return this.$store.state.settings.isCenteredImageMode;
@@ -51,7 +51,7 @@ export default class SettingsMenu extends Vue {
     return this.$store.state.settings.isScaledImageMode;
   }
 
-  toggle(): void {
+  public toggle(): void {
     if (this.dialog.isOpen) {
       this.dialog.close();
     } else {
@@ -59,22 +59,24 @@ export default class SettingsMenu extends Vue {
     }
   }
 
-  mounted(): void {
+  public mounted(): void {
     this.$parent.$on('settingstoggle', this.toggle);
-    this.dialog = new OdoDialog(document.getElementById('settings-dialog'));
+    const element = document.getElementById('settings-dialog');
+    if (element) {
+      this.dialog = new OdoDialog(element);
+    }
   }
 
-  beforeDestroy(): void {
+  public beforeDestroy(): void {
     this.dialog.dispose();
-    this.dialog = null;
   }
 
-  layoutChange(event: Event): void {
+  public layoutChange(event: Event): void {
     const target = event.target as HTMLInputElement;
     this.$store.commit('setIsCenteredImageMode', target.checked);
   }
 
-  retinaChange(event: Event): void {
+  public retinaChange(event: Event): void {
     const target = event.target as HTMLInputElement;
     this.$store.commit('setIsScaledImageMode', target.checked);
   }

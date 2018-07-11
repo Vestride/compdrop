@@ -37,7 +37,7 @@ import DisplayImage from '../DisplayImage';
   },
 })
 export default class ImageViewer extends Vue {
-  collectionIndex: number;
+  public collectionIndex!: number;
 
   get images(): DisplayImage[] {
     return this.$store.state.collections[this.collectionIndex].images;
@@ -47,10 +47,10 @@ export default class ImageViewer extends Vue {
     return this.$store.state.selectedImages[this.collectionIndex];
   }
 
-  setSelectedIndex(index: number, scrollToTop: boolean = true): void {
+  public setSelectedIndex(index: number, scrollToTop: boolean = true): void {
     if (index >= 0 || index < this.images.length) {
       this.$store.commit('selectImage', {
-        index: index,
+        index,
         collectionIndex: this.collectionIndex,
       });
 
@@ -60,21 +60,21 @@ export default class ImageViewer extends Vue {
     }
   }
 
-  handleNextTrigger(evt: MouseEvent | KeyboardEvent): void {
+  public handleNextTrigger(evt: MouseEvent | KeyboardEvent): void {
     this.goToNext(evt.shiftKey === false);
   }
 
-  handlePreviousTrigger(evt: MouseEvent | KeyboardEvent): void {
+  public handlePreviousTrigger(evt: MouseEvent | KeyboardEvent): void {
     this.goToPrevious(evt.shiftKey === false);
   }
 
-  goToNext(scrollToTop: boolean): void {
+  public goToNext(scrollToTop: boolean): void {
     this.setSelectedIndex(this.selectedIndex === this.images.length - 1 ?
       0 :
       this.selectedIndex + 1, scrollToTop);
   }
 
-  goToPrevious(scrollToTop: boolean): void {
+  public goToPrevious(scrollToTop: boolean): void {
     this.setSelectedIndex(this.selectedIndex === 0 ?
       this.images.length - 1 :
       this.selectedIndex - 1, scrollToTop);

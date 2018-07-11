@@ -44,9 +44,9 @@ import Collection from '../Collection';
 
 @Component
 export default class CollectionsMenu extends Vue {
-  dialog: OdoDialog;
+  public dialog!: OdoDialog;
 
-  toggle(): void {
+  public toggle(): void {
     if (this.dialog.isOpen) {
       this.dialog.close();
     } else {
@@ -54,22 +54,24 @@ export default class CollectionsMenu extends Vue {
     }
   }
 
-  select(collectionIndex: number, imageIndex: number): void {
+  public select(collectionIndex: number, imageIndex: number): void {
     this.$store.commit('selectImage', {
       index: imageIndex,
-      collectionIndex: collectionIndex,
+      collectionIndex,
     });
     this.dialog.close();
   }
 
-  mounted(): void {
+  public mounted(): void {
     this.$parent.$on('collectionstoggle', this.toggle);
-    this.dialog = new OdoDialog(document.getElementById('collections-dialog'));
+    const element = document.getElementById('collections-dialog');
+    if (element) {
+      this.dialog = new OdoDialog(element);
+    }
   }
 
-  beforeDestroy(): void {
+  public beforeDestroy(): void {
     this.dialog.dispose();
-    this.dialog = null;
   }
 }
 </script>

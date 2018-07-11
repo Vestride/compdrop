@@ -22,7 +22,7 @@ export default class CollectionViewer extends Vue {
     return this.$store.state.selectedCollectionIndex;
   }
 
-  setSelectedGroup(index: number): void {
+  public setSelectedGroup(index: number): void {
     this.$store.commit('setSelectedGroup', index);
     // Focus on the image viewer element so the bound keyboard events work.
     const imageViewer = this.getImageViewer(index);
@@ -31,15 +31,15 @@ export default class CollectionViewer extends Vue {
     });
   }
 
-  getImageViewer(index: number): ImageViewer {
-    return (<any>this.$refs.imageViewer)[index] as ImageViewer;
+  public getImageViewer(index: number): ImageViewer {
+    return (this.$refs.imageViewer as any)[index] as ImageViewer;
   }
 
-  mounted(): void {
+  public mounted(): void {
     this.$parent.$on('selectgroup', this.setSelectedGroup);
   }
 
-  created(): void {
+  public created(): void {
     this.$store.commit('setSelectedGroup', 0);
   }
 }

@@ -26,8 +26,6 @@ Vue.component('keyboard-shortcuts', KeyboardShortcuts);
 
 /* eslint-disable no-new */
 new Vue({
-  el: '#app',
-  store: store,
-  template: '<App/>',
-  components: { App },
-});
+  store,
+  render: (h) => h(App),
+}).$mount('#app');

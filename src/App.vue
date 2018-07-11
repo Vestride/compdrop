@@ -34,26 +34,26 @@ function uniqueId(): number {
 
 @Component
 export default class App extends Vue {
-  hasContent: boolean = false;
-  canDrop: boolean = false;
-  isLoading: boolean = false;
+  public hasContent: boolean = false;
+  public canDrop: boolean = false;
+  public isLoading: boolean = false;
 
   // Activity watcher.
-  isUserActive: boolean = false;
-  timer: number;
+  public isUserActive: boolean = false;
+  public timer: number = 0;
 
-  _handleDragHover(evt: DragEvent): void {
+  public _handleDragHover(evt: DragEvent): void {
     evt.preventDefault();
     evt.dataTransfer.dropEffect = 'copy';
     this.canDrop = true;
   }
 
-  _handleDragCancel(evt: DragEvent): void {
+  public _handleDragCancel(evt: DragEvent): void {
     evt.preventDefault();
     this.canDrop = false;
   }
 
-  _handleDrop(evt: DragEvent): void {
+  public _handleDrop(evt: DragEvent): void {
     evt.preventDefault();
 
     this.isLoading = true;
@@ -62,7 +62,7 @@ export default class App extends Vue {
     const done = () => {
       this.isLoading = false;
       requestAnimationFrame(() => {
-        console.log(`Drop took ${Date.now() - start} milliseconds`)
+        console.info(`Drop took ${Date.now() - start} milliseconds`);
       });
     };
 
@@ -80,14 +80,14 @@ export default class App extends Vue {
     }
   }
 
-  _handleFilesChosen(files: File[]): void {
+  public _handleFilesChosen(files: File[]): void {
     this._addFileList({
       name: '',
-      files: files,
+      files,
     });
   }
 
-  _addFileList(fileCollection: FileCollection): Promise<void> {
+  public _addFileList(fileCollection: FileCollection): Promise<void> {
     // Filter out non-images and sort by file name.
     const files = fileCollection.files
       .filter(isImageFile)
@@ -108,10 +108,14 @@ export default class App extends Vue {
     return promise;
   }
 
-  async renderFirstImageThenOthers(files: File[], collectionName: string): Promise<void> {
+  public async renderFirstImageThenOthers(files: File[], collectionName: string): Promise<void> {
     const collectionId = uniqueId();
     // Remove the first file from the array.
     const first = files.shift();
+
+    if (!first) {
+      return Promise.resolve();
+    }
 
     // Read the file and update the images property so that Vue re-renders.
     // This intentionally blocks execution for reading the other files.
@@ -133,7 +137,7 @@ export default class App extends Vue {
         Promise.all(this.getDisplayImages(files)).then((images) => {
           this.$store.commit('updateCollectionImages', {
             index: collectionIndex,
-            images: images,
+            images,
           });
           this.updatePageTitle();
           resolve();
@@ -142,11 +146,11 @@ export default class App extends Vue {
     });
   }
 
-  getDisplayImages(files: File[]): Promise<DisplayImage>[] {
+  public getDisplayImages(files: File[]): Array<Promise<DisplayImage>> {
     return files.map(this.getDisplayImage);
   }
 
-  getDisplayImage(file: File): Promise<DisplayImage> {
+  public getDisplayImage(file: File): Promise<DisplayImage> {
     return readFileAsDataURL(file).then((dataURL: string) => {
       return {
         id: uniqueId(),
@@ -156,11 +160,11 @@ export default class App extends Vue {
     });
   }
 
-  updatePageTitle(): void {
+  public updatePageTitle(): void {
     document.title = this.$store.getters.pageTitle as string;
   }
 
-  mounted(): void {
+  public mounted(): void {
     this._handleKeyDown = this._handleKeyDown.bind(this);
     this._handleDragHover = this._handleDragHover.bind(this);
     this._handleDragCancel = this._handleDragCancel.bind(this);
@@ -171,17 +175,17 @@ export default class App extends Vue {
     document.body.addEventListener('drop', this._handleDrop);
   }
 
-  beforeDestroy(): void {
+  public beforeDestroy(): void {
     document.body.removeEventListener('keydown', this._handleKeyDown);
     document.body.removeEventListener('dragover', this._handleDragHover);
     document.body.removeEventListener('dragleave', this._handleDragCancel);
     document.body.removeEventListener('drop', this._handleDrop);
   }
 
-  _handleKeyDown(evt: KeyboardEvent): void {
+  public _handleKeyDown(evt: KeyboardEvent): void {
     this.handleUserAction();
-    const number = parseInt(evt.key, 10);
-    const isNumber = !isNaN(number);
+    const keyNumber = parseInt(evt.key, 10);
+    const isNumber = !isNaN(keyNumber);
 
     if (evt.key === '?') {
       this.helpToggle();
@@ -195,36 +199,36 @@ export default class App extends Vue {
       this.reset();
       this.updatePageTitle();
     } else if (this.hasContent && isNumber && !evt.metaKey && !evt.shiftKey) {
-      this.$emit('selectgroup', number - 1);
+      this.$emit('selectgroup', keyNumber - 1);
     }
   }
 
-  helpToggle(): void {
+  public helpToggle(): void {
     this.$emit('helptoggle');
   }
 
-  settingsToggle(): void {
+  public settingsToggle(): void {
     this.$emit('settingstoggle');
   }
 
-  collectionsToggle(): void {
+  public collectionsToggle(): void {
     this.$emit('collectionstoggle');
   }
 
-  reset(): void {
+  public reset(): void {
     this.$store.commit('emptyCollections');
     this.hasContent = false;
   }
 
   // Activity watcher
-  handleUserAction(): void {
-    clearTimeout(this.timer);
+  public handleUserAction(): void {
+    window.clearTimeout(this.timer);
     this.isUserActive = true;
-    this.timer = setTimeout(() => {
+    this.timer = window.setTimeout(() => {
       this.isUserActive = false;
     }, 3000);
   }
-};
+}
 </script>
 
 <style>

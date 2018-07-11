@@ -52,7 +52,9 @@ export default new Vuex.Store({
     pageTitle(state: State): string {
       if (state.collections.length > 1) {
         const totalImages = state.collections.reduce((total, collection) => total + collection.images.length, 0);
-        return `${maybePluralize(state.collections.length, 'collection')} – ${maybePluralize(totalImages, 'image')} – compdrop`;
+        return `${
+          maybePluralize(state.collections.length, 'collection')
+        } – ${maybePluralize(totalImages, 'image')} – compdrop`;
       }
 
       if (state.collections.length > 0) {
@@ -60,7 +62,7 @@ export default new Vuex.Store({
       }
 
       return 'compdrop';
-    }
-  }
+    },
+  },
 });
 

@@ -27,11 +27,13 @@ import Component from 'vue-class-component';
   },
 })
 export default class WelcomeScreen extends Vue {
-  canDrop: boolean;
+  // public canDrop: boolean;
 
-  handleFiles(evt: Event): void {
+  public handleFiles(evt: Event): void {
     const target = evt.target as HTMLInputElement;
-    this.$emit('fileschosen', Array.from(target.files));
+    if (target.files) {
+      this.$emit('fileschosen', Array.from(target.files));
+    }
     target.value = '';
   }
 }

@@ -36,8 +36,8 @@ function partition<T>(collection: T[], predicate: (item: T) => boolean): T[][] {
  * Flatten an array, but only a single level deep.
  */
 function flattenOnce<T>(collection: T[][]): T[] {
-  return collection.reduce((result: T[], collection: T[]) => {
-    return result.concat(collection);
+  return collection.reduce((result: T[], collectionArray: T[]) => {
+    return result.concat(collectionArray);
   }, []);
 }
 
@@ -50,23 +50,24 @@ function getFile(entry: FileSystemEntry): Promise<File> {
   });
 }
 
-function getFilesFromDirectoryEntry(entry: FileSystemEntry, collections: FileCollection[] = []): Promise<FileCollection[]> {
+function getFilesFromDirectoryEntry(entry: FileSystemEntry, collections: FileCollection[] = []):
+Promise<FileCollection[]> {
   const directoryName = getDirectoryName(entry.fullPath);
   return new Promise((resolve) => {
     entry.createReader().readEntries((entries: FileSystemEntry[]) => {
       // Split files and directories apart.
-      const parts = partition(entries, entry => entry.isFile);
+      const parts = partition(entries, (singleEntry) => singleEntry.isFile);
 
       // Once all the initial files have been read, add them to the collections
       // array and start reading directories.
       Promise.all(parts[0].map(getFile)).then((files: File[]) => {
         const fileCollection: FileCollection = {
           name: directoryName,
-          files: files,
+          files,
         };
         collections.push(fileCollection);
         // Recursively read directories.
-        const directories = parts[1].map(entry => getFilesFromDirectoryEntry(entry, collections));
+        const directories = parts[1].map((singleEntry) => getFilesFromDirectoryEntry(singleEntry, collections));
         // Since the collections array is passed as an argument and mutated
         // within this recursive function, we don't care about the resolved
         // promise value for any recursed calls to this function.
@@ -123,7 +124,7 @@ export function readFileAsDataURL(file: File): Promise<string> {
 
     // Resolve promise when the reader finishes.
     reader.onload = () => {
-      console.log(`Read took ${Date.now() - start} milliseconds`)
+      console.info(`Read took ${Date.now() - start} milliseconds`);
       resolve(reader.result as string);
     };
 
@@ -135,14 +136,14 @@ export function readFileAsDataURL(file: File): Promise<string> {
 export function readDroppedItems(itemList: DataTransferItemList): Promise<FileCollection[]> {
   // https://developer.mozilla.org/en-US/docs/Web/API/DataTransferItem/webkitGetAsEntry
   const entries = Array.from(itemList)
-    .map(item => item.webkitGetAsEntry())
-    .filter(entry => !!entry);
+    .map((item) => item.webkitGetAsEntry())
+    .filter((entry) => !!entry);
 
   const [files, dirs] = partition(entries, (entry: FileSystemEntry) => entry.isFile);
 
   return Promise.all([
     Promise.all(files.map(getFile)),
-    Promise.all(dirs.map(entry => getFilesFromDirectoryEntry(entry))),
+    Promise.all(dirs.map((entry) => getFilesFromDirectoryEntry(entry))),
   ]).then((result) => {
     const looseFiles: File[] = result[0];
     const groups: FileCollection[][] = result[1];
